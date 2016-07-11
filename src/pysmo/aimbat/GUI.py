@@ -186,17 +186,21 @@ class mainGUI(object):
 		#If single click select / deselect a plot
 		if plotItemClicked is self.stackedPlot:
 			return
-
+		
 		if plotItemClicked.curves[0].selected:
 			plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 			plotItemClicked.curves[0].selected = False
 			self.selectedIndexes.remove(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = False
+			self.sacgroup.selist.remove(plotItemClicked.sacdh)
+			self.sacgroup.delist.append(plotItemClicked.sacdh)
 		else:
 			plotItemClicked.curves[0].setFillBrush((255, 0, 0, 75))
 			plotItemClicked.curves[0].selected = True
 			self.selectedIndexes.append(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = True
+			self.sacgroup.delist.remove(plotItemClicked.sacdh)
+			self.sacgroup.selist.append(plotItemClicked.sacdh)
 		#plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 		#self.gfxWidget.removeItem(plotItemClicked)
 
