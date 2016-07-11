@@ -43,6 +43,10 @@ class mainGUI(object):
 		self.addWidget(scrollArea, 1, 0, xSpan = 1, ySpan = 10)
 		self.putButtons()
 
+		self.opts.sortby = 'all'
+		self.sortSeis()
+		self.reorderPlots()
+
 		self.gfxWidget.scene().sigMouseClicked.connect(self.mouseClickEvents)
 
 		self.stackedPlot.enableAutoRange('x', True)
@@ -148,6 +152,7 @@ class mainGUI(object):
 		quitbtn.clicked.connect(self.quitButtonClicked)
 		savebtn.clicked.connect(self.saveButtonClicked)
 		sortbtn.clicked.connect(self.sortButtonClicked)
+		sacp2btn.clicked.connect(self.sacp2ButtonClicked)
 
 		self.addWidget(alignbtn, 0, 0)
 		self.addWidget(syncbtn, 0, 1)
@@ -414,6 +419,64 @@ class mainGUI(object):
 
 		self.sortSeis()
 		self.reorderPlots()
+
+	def sacp2ButtonClicked(self):
+		# print 'SAC P2 Clicked'
+		sacp2Window = QWidget()
+		sacp2Window.setWindowTitle('SAC P2')
+		sacp2Window.show()
+		sacp2layout = QGridLayout(sacp2Window)
+
+		sacp2gfxWidget = pg.GraphicsLayoutWidget()
+		sacp2gfxWidget.resize(1800, 1200)
+
+
+		plot1 = sacp2gfxWidget.addPlot(title = 'Plot T0')
+		sacp2gfxWidget.nextRow()
+		plot2 = sacp2gfxWidget.addPlot(title = 'Plot T1')
+		sacp2gfxWidget.nextRow()
+		plot3 = sacp2gfxWidget.addPlot(title = 'Plot T2')
+		sacp2gfxWidget.nextRow()
+		plot4 = sacp2gfxWidget.addPlot(title = 'Plot T3')
+		sacp2gfxWidget.nextRow()
+
+		for sacdh in self.sacgroup.selist:
+			dataSet = getWaveDataSetFromSacItem(sacdh)
+
+			hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+
+			shiftT0 = sacdh.gethdr(hdrini)
+			shiftT1 = sacdh.gethdr(hdrmed)
+			shiftT2 = sacdh.gethdr(hdrfin)
+			shiftT3 = sacdh.gethdr(self.opts.mcpara.wpick)
+
+			shiftedXT0 = [val - shiftT0 for val in dataSet.x]
+			shiftedXT1 = [val - shiftT1 for val in dataSet.x]
+			shiftedXT2 = [val - shiftT2 for val in dataSet.x]
+			shiftedXT3 = [val - shiftT3 for val in dataSet.x]
+
+			plot1.plot(shiftedXT0, dataSet.y)
+			plot2.plot(shiftedXT1, dataSet.y)
+			plot3.plot(shiftedXT2, dataSet.y)
+			plot4.plot(shiftedXT3, dataSet.y)
+
+		plot1.hideAxis('bottom')
+		plot1.hideAxis('left')
+		plot2.hideAxis('bottom')
+		plot2.hideAxis('left')
+		plot3.hideAxis('bottom')
+		plot3.hideAxis('left')
+		plot4.hideAxis('bottom')
+		plot4.hideAxis('left')
+
+
+		sacp2layout.addWidget(sacp2gfxWidget, 0, 0, 1, 1)
+		sacp2Window.resize(1800, 1200)
+
+		# write to class varable so garage collector doesn't delete window
+		self.sacp2Window = sacp2Window
+
+		self.sacp2Window.show()
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
