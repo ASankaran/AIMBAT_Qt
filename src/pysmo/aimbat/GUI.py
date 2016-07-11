@@ -186,7 +186,7 @@ class mainGUI(object):
 		#If single click select / deselect a plot
 		if plotItemClicked is self.stackedPlot:
 			return
-		
+
 		if plotItemClicked.curves[0].selected:
 			plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 			plotItemClicked.curves[0].selected = False
@@ -426,61 +426,64 @@ class mainGUI(object):
 
 	def sacp2ButtonClicked(self):
 		# print 'SAC P2 Clicked'
-		sacp2Window = QWidget()
-		sacp2Window.setWindowTitle('SAC P2')
-		sacp2Window.show()
-		sacp2layout = QGridLayout(sacp2Window)
+		# sacp2Window = QWidget()
+		# sacp2Window.setWindowTitle('SAC P2')
+		# sacp2Window.show()
+		# sacp2layout = QGridLayout(sacp2Window)
 
-		sacp2gfxWidget = pg.GraphicsLayoutWidget()
-		sacp2gfxWidget.resize(1800, 1200)
-
-
-		plot1 = sacp2gfxWidget.addPlot(title = 'Plot T0')
-		sacp2gfxWidget.nextRow()
-		plot2 = sacp2gfxWidget.addPlot(title = 'Plot T1')
-		sacp2gfxWidget.nextRow()
-		plot3 = sacp2gfxWidget.addPlot(title = 'Plot T2')
-		sacp2gfxWidget.nextRow()
-		plot4 = sacp2gfxWidget.addPlot(title = 'Plot T3')
-		sacp2gfxWidget.nextRow()
-
-		for sacdh in self.sacgroup.selist:
-			dataSet = getWaveDataSetFromSacItem(sacdh)
-
-			hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-
-			shiftT0 = sacdh.gethdr(hdrini)
-			shiftT1 = sacdh.gethdr(hdrmed)
-			shiftT2 = sacdh.gethdr(hdrfin)
-			shiftT3 = sacdh.gethdr(self.opts.mcpara.wpick)
-
-			shiftedXT0 = [val - shiftT0 for val in dataSet.x]
-			shiftedXT1 = [val - shiftT1 for val in dataSet.x]
-			shiftedXT2 = [val - shiftT2 for val in dataSet.x]
-			shiftedXT3 = [val - shiftT3 for val in dataSet.x]
-
-			plot1.plot(shiftedXT0, dataSet.y)
-			plot2.plot(shiftedXT1, dataSet.y)
-			plot3.plot(shiftedXT2, dataSet.y)
-			plot4.plot(shiftedXT3, dataSet.y)
-
-		plot1.hideAxis('bottom')
-		plot1.hideAxis('left')
-		plot2.hideAxis('bottom')
-		plot2.hideAxis('left')
-		plot3.hideAxis('bottom')
-		plot3.hideAxis('left')
-		plot4.hideAxis('bottom')
-		plot4.hideAxis('left')
+		# sacp2gfxWidget = pg.GraphicsLayoutWidget()
+		# sacp2gfxWidget.resize(1800, 1200)
 
 
-		sacp2layout.addWidget(sacp2gfxWidget, 0, 0, 1, 1)
-		sacp2Window.resize(1800, 1200)
+		# plot1 = sacp2gfxWidget.addPlot(title = 'Plot T0')
+		# sacp2gfxWidget.nextRow()
+		# plot2 = sacp2gfxWidget.addPlot(title = 'Plot T1')
+		# sacp2gfxWidget.nextRow()
+		# plot3 = sacp2gfxWidget.addPlot(title = 'Plot T2')
+		# sacp2gfxWidget.nextRow()
+		# plot4 = sacp2gfxWidget.addPlot(title = 'Plot T3')
+		# sacp2gfxWidget.nextRow()
 
-		# write to class varable so garage collector doesn't delete window
-		self.sacp2Window = sacp2Window
+		# for sacdh in self.sacgroup.selist:
+		# 	dataSet = getWaveDataSetFromSacItem(sacdh)
 
-		self.sacp2Window.show()
+		# 	hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+
+		# 	shiftT0 = sacdh.gethdr(hdrini)
+		# 	shiftT1 = sacdh.gethdr(hdrmed)
+		# 	shiftT2 = sacdh.gethdr(hdrfin)
+		# 	shiftT3 = sacdh.gethdr(self.opts.mcpara.wpick)
+
+		# 	shiftedXT0 = [val - shiftT0 for val in dataSet.x]
+		# 	shiftedXT1 = [val - shiftT1 for val in dataSet.x]
+		# 	shiftedXT2 = [val - shiftT2 for val in dataSet.x]
+		# 	shiftedXT3 = [val - shiftT3 for val in dataSet.x]
+
+		# 	plot1.plot(shiftedXT0, dataSet.y)
+		# 	plot2.plot(shiftedXT1, dataSet.y)
+		# 	plot3.plot(shiftedXT2, dataSet.y)
+		# 	plot4.plot(shiftedXT3, dataSet.y)
+
+		# plot1.hideAxis('bottom')
+		# plot1.hideAxis('left')
+		# plot2.hideAxis('bottom')
+		# plot2.hideAxis('left')
+		# plot3.hideAxis('bottom')
+		# plot3.hideAxis('left')
+		# plot4.hideAxis('bottom')
+		# plot4.hideAxis('left')
+
+
+		# sacp2layout.addWidget(sacp2gfxWidget, 0, 0, 1, 1)
+		# sacp2Window.resize(1800, 1200)
+
+		# # write to class varable so garage collector doesn't delete window
+		# self.sacp2Window = sacp2Window
+
+		# self.sacp2Window.show()
+
+		self.sacp2Window = sacp2GUI(self.sacgroup, self.opts)
+		self.sacp2Window.start()
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
@@ -643,3 +646,67 @@ class mainGUI(object):
 	# 		sn = plot.sacdh.gethdr(hdrsn)
 	# 		co = plot.sacdh.gethdr(hdrco)
 	# 		print 'qual={0:4.2f}/{1:.1f}/{2:4.2f}'.format(cc, sn, co)
+
+
+class sacp2GUI(object):
+	def __init__(self, sacgroup, opts):
+		self.sacgroup = sacgroup
+		self.opts = opts
+
+	def start(self):
+		sacp2Window = QWidget()
+		sacp2Window.setWindowTitle('SAC P2')
+		sacp2Window.show()
+		sacp2layout = QGridLayout(sacp2Window)
+
+		sacp2gfxWidget = pg.GraphicsLayoutWidget()
+		sacp2gfxWidget.resize(1800, 1200)
+
+
+		plot1 = sacp2gfxWidget.addPlot(title = 'Plot T0')
+		sacp2gfxWidget.nextRow()
+		plot2 = sacp2gfxWidget.addPlot(title = 'Plot T1')
+		sacp2gfxWidget.nextRow()
+		plot3 = sacp2gfxWidget.addPlot(title = 'Plot T2')
+		sacp2gfxWidget.nextRow()
+		plot4 = sacp2gfxWidget.addPlot(title = 'Plot T3')
+		sacp2gfxWidget.nextRow()
+
+		for sacdh in self.sacgroup.selist:
+			dataSet = getWaveDataSetFromSacItem(sacdh)
+
+			hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+
+			shiftT0 = sacdh.gethdr(hdrini)
+			shiftT1 = sacdh.gethdr(hdrmed)
+			shiftT2 = sacdh.gethdr(hdrfin)
+			shiftT3 = sacdh.gethdr(self.opts.mcpara.wpick)
+
+			shiftedXT0 = [val - shiftT0 for val in dataSet.x]
+			shiftedXT1 = [val - shiftT1 for val in dataSet.x]
+			shiftedXT2 = [val - shiftT2 for val in dataSet.x]
+			shiftedXT3 = [val - shiftT3 for val in dataSet.x]
+
+			plot1.plot(shiftedXT0, dataSet.y)
+			plot2.plot(shiftedXT1, dataSet.y)
+			plot3.plot(shiftedXT2, dataSet.y)
+			plot4.plot(shiftedXT3, dataSet.y)
+
+		plot1.hideAxis('bottom')
+		plot1.hideAxis('left')
+		plot2.hideAxis('bottom')
+		plot2.hideAxis('left')
+		plot3.hideAxis('bottom')
+		plot3.hideAxis('left')
+		plot4.hideAxis('bottom')
+		plot4.hideAxis('left')
+
+
+		sacp2layout.addWidget(sacp2gfxWidget, 0, 0, 1, 1)
+		sacp2Window.resize(1800, 1200)
+
+		# write to class varable so garage collector doesn't delete window
+		self.sacp2Window = sacp2Window
+
+		self.sacp2Window.show()
+		
