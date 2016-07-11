@@ -687,10 +687,15 @@ class sacp2GUI(object):
 			shiftedXT2 = [val - shiftT2 for val in dataSet.x]
 			shiftedXT3 = [val - shiftT3 for val in dataSet.x]
 
-			plot1.plot(shiftedXT0, dataSet.y)
-			plot2.plot(shiftedXT1, dataSet.y)
-			plot3.plot(shiftedXT2, dataSet.y)
-			plot4.plot(shiftedXT3, dataSet.y)
+			pltItem1 = plot1.plot(shiftedXT0, dataSet.y)
+			pltItem2 = plot2.plot(shiftedXT1, dataSet.y)
+			pltItem3 = plot3.plot(shiftedXT2, dataSet.y)
+			pltItem4 = plot4.plot(shiftedXT3, dataSet.y)
+
+			pltItem1.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
+			pltItem2.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
+			pltItem3.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
+			pltItem4.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
 
 		plot1.hideAxis('bottom')
 		plot1.hideAxis('left')
@@ -707,6 +712,14 @@ class sacp2GUI(object):
 
 		# write to class varable so garage collector doesn't delete window
 		self.sacp2Window = sacp2Window
+		self.sacp2gfxWidget = sacp2gfxWidget
+
+		for curve in plot1.curves + plot2.curves + plot3.curves + plot4.curves:
+			curve.curve.setClickable(True)
+			curve.curve.sigClicked.connect(self.mouseClickEvents)
 
 		self.sacp2Window.show()
+
+	def mouseClickEvents(self, event):
+		print event.name()
 		
