@@ -1,0 +1,7 @@
+*.py[cod]
+*.so
+.svn
+build/
+dist/
+.DS_Store
+*.mcp
