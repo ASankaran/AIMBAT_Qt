@@ -788,7 +788,7 @@ class filterGUI(object):
 		for i in xrange(0, len(orderRadioButtons)):
 			orderButtonGroup.addButton(orderRadioButtons[i])
 			orderButtonLayout.addWidget(orderRadioButtons[i])
-		orderRadioButtons[1].setChecked(True)
+		orderRadioButtons[['1', '2', '3', '4'].index(str(self.opts.filterParameters['order']))].setChecked(True)
 		orderButtonGroup.buttonClicked[QAbstractButton].connect(self.orderChanged)
 
 		filterButtonWidget = QGroupBox('Filter Type:')
@@ -800,7 +800,7 @@ class filterGUI(object):
 		for i in xrange(0, len(filterTypeRadioButtons)):
 			filterTypeButtonGroup.addButton(filterTypeRadioButtons[i])
 			filterButtonLayout.addWidget(filterTypeRadioButtons[i])
-		filterTypeRadioButtons[0].setChecked(True)
+		filterTypeRadioButtons[['bandpass', 'lowpass', 'highpass'].index(self.opts.filterParameters['band'])].setChecked(True)
 		filterTypeButtonGroup.buttonClicked[QAbstractButton].connect(self.filterTypeChanged)
 
 		runReverseButtonWidget = QGroupBox('Run Reverse:')
@@ -812,7 +812,7 @@ class filterGUI(object):
 		for i in xrange(0, len(runReverseRadioButtons)):
 			runReverseButtonGroup.addButton(runReverseRadioButtons[i])
 			runReverseButtonLayout.addWidget(runReverseRadioButtons[i])
-		runReverseRadioButtons[1].setChecked(True)
+		runReverseRadioButtons[['yes', 'no'].index('yes' if self.opts.filterParameters['reversepass'] else 'no')].setChecked(True)
 		runReverseButtonGroup.buttonClicked[QAbstractButton].connect(self.runReverseChanged)
 
 		self.addWidget(orderButtonWidget, 0, 0)
