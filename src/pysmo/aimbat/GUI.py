@@ -10,7 +10,9 @@ from algiccs import ccWeightStack
 from algmccc import eventListName, mccc
 from sacpickle import taperWindow, saveData
 from qualsort import seleSeis, sortSeisQual, sortSeisHeader, sortSeisHeaderDiff
+import filtering
 
+import numpy as np
 from numpy import nan
 
 
@@ -489,7 +491,7 @@ class mainGUI(object):
 		self.sacp2Window.start()
 
 	def filterButtonClicked(self):
-		self.filterWindow = filterGUI(self.sacgroup, self.opts)
+		self.filterWindow = filterGUI(self.sacgroup, self.stkdh, self.opts)
 		self.filterWindow.start()
 
 	def addTimePick(self, plot, xVal, pick):
@@ -732,17 +734,28 @@ class sacp2GUI(object):
 
 
 class filterGUI(object):
-	def __init__(self, sacgroup, opts):
+	def __init__(self, sacgroup, stkdh, opts):
 		self.sacgroup = sacgroup
 		self.opts = opts
+		self.stkdh = stkdh
 
 		self.filterWindow = QWidget()
 		self.filterWindow.setWindowTitle('Filtering')
 		self.filterWindow.show()
 		self.filterlayout = QGridLayout(self.filterWindow)
 
+		self.filtergfxWidget = None
+
+		self.signaltimePlot = None
+		self.freqampPlot = None
+		self.signaltimeLegend = None
+		self.freqampLegend = None
+
 	def start(self):
 		self.initGUI()
+
+		self.filtergfxWidget.scene().sigMouseClicked.connect(self.mouseClickEvents)
+
 		self.filterWindow.show()
 
 	def initGUI(self):
@@ -812,14 +825,14 @@ class filterGUI(object):
 
 		self.addWidget(settingsWidget, 0, 4)
 
-		filtergfxWidget = pg.GraphicsLayoutWidget()
-		filtergfxWidget.resize(1800, 1200)
+		self.filtergfxWidget = pg.GraphicsLayoutWidget()
+		self.filtergfxWidget.resize(1800, 1200)
 
-		plot1 = filtergfxWidget.addPlot(title = 'Signal vs. Time')
-		filtergfxWidget.nextRow()
-		plot2 = filtergfxWidget.addPlot(title = 'Frequency vs Amplitude')
+		self.signaltimePlot = self.filtergfxWidget.addPlot(title = 'Signal vs. Time')
+		self.filtergfxWidget.nextRow()
+		self.freqampPlot = self.filtergfxWidget.addPlot(title = 'Frequency vs Amplitude')
 
-		self.addWidget(filtergfxWidget, 6, 0, 15, 5)
+		self.addWidget(self.filtergfxWidget, 6, 0, 15, 5)
 
 		self.filterWindow.resize(1800, 1200)
 
@@ -830,13 +843,43 @@ class filterGUI(object):
 
 		self.updateLabels()
 
+		self.signaltimeLegend = self.signaltimePlot.addLegend()
+		self.freqampLegend = self.freqampPlot.addLegend()
+		self.signaltimeLegend.anchor(itemPos = (1, 0), parentPos = (1, 0), offset = (-30, 30))
+		self.freqampLegend.anchor(itemPos = (1, 0), parentPos = (1, 0), offset = (-30, 30))
+
+		self.runFilter()
+
 	def addWidget(self, widget, xLoc, yLoc, xSpan = 1, ySpan = 1):
 		self.filterlayout.addWidget(widget, xLoc, yLoc, xSpan, ySpan)
+
+	def mouseClickEvents(self, event):
+		plotItemClicked = None
+		for item in self.filtergfxWidget.scene().items(event.scenePos()):
+			if isinstance(item, pg.graphicsItems.PlotItem.PlotItem):
+				plotItemClicked = item
+
+		if plotItemClicked is self.freqampPlot:
+			plotVB = plotItemClicked.getViewBox()
+			xpoint = plotVB.mapToView(event.pos()).x()
+
+			if self.opts.filterParameters['advance']:
+				self.opts.filterParameters['highFreq'] = xpoint
+				if self.opts.filterParameters['lowFreq'] < self.opts.filterParameters['highFreq']:
+					self.opts.filterParameters['advance'] = False
+					self.runFilter()
+				else:
+					print 'Value chose must be higher than lower frequency of %f' % self.opts.filterParameters['lowFreq']
+			else:
+				self.opts.filterParameters['lowFreq'] = xpoint
+				self.opts.filterParameters['advance'] = True
+
 
 	def orderChanged(self, event):
 		# print 'Order Changed', event.text()
 		self.opts.filterParameters['order'] = int(event.text())
 		self.updateLabels()
+		self.runFilter()
 
 	def filterTypeChanged(self, event):
 		# print 'Filter Type Changed', event.text()
@@ -854,6 +897,7 @@ class filterGUI(object):
 			self.opts.filterParameters['highFreq'] = 0.25
 			self.opts.filterParameters['advance'] = False
 		self.updateLabels()
+		self.runFilter()
 
 	def runReverseChanged(self, event):
 		# print 'Run Reverse Changed', event.text()
@@ -861,6 +905,7 @@ class filterGUI(object):
 			self.opts.filterParameters['reversepass'] = True
 		elif event.text() == 'no':
 			self.opts.filterParameters['reversepass'] = False
+		self.runFilter()
 
 	def applyClicked(self, event):
 		print 'Apply Clicked', event
@@ -872,4 +917,37 @@ class filterGUI(object):
 		self.lowFreqLabel.setText('Low Freq: ' + str(self.opts.filterParameters['lowFreq']))
 		self.highFreqLabel.setText('High Freq: ' + str(self.opts.filterParameters['highFreq']))
 		self.orderLabel.setText('Order: ' + str(self.opts.filterParameters['order']))
+
+	def runFilter(self):
+		data = getWaveDataSetFromSacItem(self.stkdh)
+		originalTime = data.x
+		originalSignalTime = data.y
+
+		originalFreq, originalSignalFreq = filtering.time_to_freq(originalTime, originalSignalTime, self.opts.delta)
+		filteredSignalTime, filteredSignalFreq, adjusted_w, adjusted_h = filtering.filtering_time_freq(originalTime, originalSignalTime, self.opts.delta, self.opts.filterParameters['band'], self.opts.filterParameters['highFreq'], self.opts.filterParameters['lowFreq'], self.opts.filterParameters['order'], self.opts.filterParameters['reversepass'])
+
+		# remove old curve and curve names from plot
+		signaltimeCurveNames = [curve.name() for curve in self.signaltimePlot.curves]
+		freqampCurveNames = [curve.name() for curve in self.freqampPlot.curves]
+		for name in signaltimeCurveNames:
+			self.signaltimeLegend.removeItem(name)
+		for name in freqampCurveNames:
+			self.freqampLegend.removeItem(name)
+		self.signaltimePlot.clear()
+		self.freqampPlot.clear()
+
+		# self.signaltimePlot.setXRange(-30.0, 30.0)
+		self.freqampPlot.setXRange(0, 1.50, padding = 0)
+
+		# signaltimeLegend = self.signaltimePlot.addLegend()
+		# freqampLegend = self.freqampPlot.addLegend()
+		# signaltimeLegend.anchor(itemPos = (1, 0), parentPos = (1, 0), offset = (-30, 30))
+		# freqampLegend.anchor(itemPos = (1, 0), parentPos = (1, 0), offset = (-30, 30))
+
+		self.signaltimePlot.plot(originalTime, originalSignalTime, pen = (0, 0, 255), name = 'Original')
+		self.signaltimePlot.plot(originalTime, filteredSignalTime, pen = (0, 255, 0), name = 'Filtered')
+
+		self.freqampPlot.plot(originalFreq, np.abs(originalSignalFreq), pen = (0, 0, 255), name = 'Original')
+		self.freqampPlot.plot(originalFreq, np.abs(filteredSignalFreq), pen = (0, 255, 0), name = 'Filtered')
+		self.freqampPlot.plot(adjusted_w, adjusted_h, pen = (255, 0, 0), name = 'Butterworth Filter')
 		
