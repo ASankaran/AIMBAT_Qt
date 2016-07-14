@@ -193,15 +193,21 @@ class mainGUI(object):
 			return
 
 		if plotItemClicked.sacdh.selected:
-			plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
-			plotItemClicked.curves[0].selected = False
+			for curve in plotItemClicked.curves:
+				curve.setFillBrush((0, 255, 0, 75))
+				curve.selected = False
+			# plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
+			# plotItemClicked.curves[0].selected = False
 			self.selectedIndexes.remove(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = False
 			self.sacgroup.selist.remove(plotItemClicked.sacdh)
 			self.sacgroup.delist.append(plotItemClicked.sacdh)
 		else:
-			plotItemClicked.curves[0].setFillBrush((255, 0, 0, 75))
-			plotItemClicked.curves[0].selected = True
+			for curve in plotItemClicked.curves:
+				curve.setFillBrush((255, 0, 0, 75))
+				curve.selected = True
+			# plotItemClicked.curves[0].setFillBrush((255, 0, 0, 75))
+			# plotItemClicked.curves[0].selected = True
 			self.selectedIndexes.append(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = True
 			self.sacgroup.delist.remove(plotItemClicked.sacdh)
@@ -661,12 +667,16 @@ class mainGUI(object):
 	def redrawPlots(self, event):
 		# print 'Redraw Plots', self.opts.filterParameters['apply']
 		dataSet = getWaveDataSetFromSacItem(self.stackedPlot.sacdh, self.opts)
-		self.stackedPlot.curves[0].clear()
+		for curve in self.stackedPlot.curves:
+			curve.clear()
+		# self.stackedPlot.curves[0].clear()
 		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
 
 		for plt in self.plotList:
 			dataSet = getWaveDataSetFromSacItem(plt.sacdh, self.opts)
-			plt.curves[0].clear()
+			for curve in plt.curves:
+				curve.clear()
+			# plt.curves[0].clear()
 			if plt.sacdh.selected:
 				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
 			else:
