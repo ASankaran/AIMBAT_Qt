@@ -101,7 +101,7 @@ class mainGUI(object):
 		self.opts.ccpara.cchdrs = [hdrini, hdrmed]
 		stkdh, stkdata, quas = ccWeightStack(self.sacgroup.saclist, self.opts)
 		self.stkdh = stkdh
-		dataSet = getWaveDataSetFromSacItem(stkdh)
+		dataSet = getWaveDataSetFromSacItem(stkdh, self.opts)
 		plt = gfxWidget.addPlot(title = dataSet.name)
 		plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
 		plt.curves[0].selected = True
@@ -117,7 +117,7 @@ class mainGUI(object):
 		# Create plots for other seismograms
 		index = 0
 		for sacitem in self.sacgroup.saclist:
-			dataSet = getWaveDataSetFromSacItem(sacitem)
+			dataSet = getWaveDataSetFromSacItem(sacitem, self.opts)
 			plt = gfxWidget.addPlot(title = dataSet.name)
 			plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
 			plt.curves[0].selected = True
@@ -192,7 +192,7 @@ class mainGUI(object):
 		if plotItemClicked is self.stackedPlot:
 			return
 
-		if plotItemClicked.curves[0].selected:
+		if plotItemClicked.sacdh.selected:
 			plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 			plotItemClicked.curves[0].selected = False
 			self.selectedIndexes.remove(plotItemClicked.index)
@@ -219,18 +219,18 @@ class mainGUI(object):
 
 		# Recreate stacked plot
 		self.stackedPlot.clearPlots()
-		dataSet = getWaveDataSetFromSacItem(self.stkdh)
+		dataSet = getWaveDataSetFromSacItem(self.stkdh, self.opts)
 		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
 		self.stackedPlot.curves[0].selected = True
 		self.stackedPlot.hideAxis('bottom')
 		self.stackedPlot.hideAxis('left')
 
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-		self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrini), hdrini) # fix to pass hdrini var
-		self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrmed), hdrmed) # fix to pass hdrini var
+		self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrini), hdrini)
+		self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrmed), hdrmed)
 		for plt in self.plotList:
-			self.addTimePick(plt, plt.sacdh.gethdr(hdrini), hdrini) # fix to pass hdrini var
-			self.addTimePick(plt, plt.sacdh.gethdr(hdrmed), hdrmed) # fix to pass hdrini var
+			self.addTimePick(plt, plt.sacdh.gethdr(hdrini), hdrini)
+			self.addTimePick(plt, plt.sacdh.gethdr(hdrmed), hdrmed)
 
 	def syncButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
@@ -493,6 +493,8 @@ class mainGUI(object):
 	def filterButtonClicked(self):
 		self.filterWindow = filterGUI(self.sacgroup, self.stkdh, self.opts)
 		self.filterWindow.start()
+		self.filterWindow.applyButton.clicked.connect(self.redrawPlots)
+		self.filterWindow.unapplyButton.clicked.connect(self.redrawPlots)
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
@@ -512,9 +514,9 @@ class mainGUI(object):
 		tw0 = self.stkdh.gethdr(twh0)
 		tw1 = self.stkdh.gethdr(twh1)
 		if tw0 == -12345.0:
-			tw0 = getWaveDataSetFromSacItem(stkdh).x[0]
+			tw0 = getWaveDataSetFromSacItem(stkdh, self.opts).x[0]
 		if tw1 == -12345.0:
-			tw0 = getWaveDataSetFromSacItem(stkdh).x[-1]
+			tw0 = getWaveDataSetFromSacItem(stkdh, self.opts).x[-1]
 		# self.calculateRefTime()
 		# tw0 -= self.stkdh.reftime
 		# tw1 -= self.stkdh.reftime
@@ -656,6 +658,21 @@ class mainGUI(object):
 	# 		co = plot.sacdh.gethdr(hdrco)
 	# 		print 'qual={0:4.2f}/{1:.1f}/{2:4.2f}'.format(cc, sn, co)
 
+	def redrawPlots(self, event):
+		# print 'Redraw Plots', self.opts.filterParameters['apply']
+		dataSet = getWaveDataSetFromSacItem(self.stackedPlot.sacdh, self.opts)
+		self.stackedPlot.curves[0].clear()
+		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+
+		for plt in self.plotList:
+			dataSet = getWaveDataSetFromSacItem(plt.sacdh, self.opts)
+			plt.curves[0].clear()
+			if plt.sacdh.selected:
+				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+			else:
+				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (0, 255, 0, 75))
+
+
 
 class sacp2GUI(object):
 	def __init__(self, sacgroup, opts):
@@ -682,7 +699,7 @@ class sacp2GUI(object):
 		sacp2gfxWidget.nextRow()
 
 		for sacdh in self.sacgroup.selist:
-			dataSet = getWaveDataSetFromSacItem(sacdh)
+			dataSet = getWaveDataSetFromSacItem(sacdh, self.opts)
 
 			hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 
@@ -701,10 +718,10 @@ class sacp2GUI(object):
 			pltItem3 = plot3.plot(shiftedXT2, dataSet.y)
 			pltItem4 = plot4.plot(shiftedXT3, dataSet.y)
 
-			pltItem1.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
-			pltItem2.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
-			pltItem3.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
-			pltItem4.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh).name
+			pltItem1.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
+			pltItem2.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
+			pltItem3.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
+			pltItem4.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
 
 		plot1.hideAxis('bottom')
 		plot1.hideAxis('left')
@@ -745,6 +762,9 @@ class filterGUI(object):
 		self.filterlayout = QGridLayout(self.filterWindow)
 
 		self.filtergfxWidget = None
+
+		self.applyButton = None
+		self.unapplyButton = None
 
 		self.signaltimePlot = None
 		self.freqampPlot = None
@@ -803,12 +823,12 @@ class filterGUI(object):
 		applyLayout = QVBoxLayout()
 		applyWidget.setLayout(applyLayout)
 
-		applyButton = QPushButton('Apply')
-		unapplyButton = QPushButton('Unapply')
-		applyLayout.addWidget(applyButton)
-		applyLayout.addWidget(unapplyButton)
-		applyButton.clicked.connect(self.applyClicked)
-		unapplyButton.clicked.connect(self.unapplyClicked)
+		self.applyButton = QPushButton('Apply')
+		self.unapplyButton = QPushButton('Unapply')
+		applyLayout.addWidget(self.applyButton)
+		applyLayout.addWidget(self.unapplyButton)
+		self.applyButton.clicked.connect(self.applyClicked)
+		self.unapplyButton.clicked.connect(self.unapplyClicked)
 
 		self.addWidget(applyWidget, 0, 3)
 
@@ -908,10 +928,12 @@ class filterGUI(object):
 		self.runFilter()
 
 	def applyClicked(self, event):
-		print 'Apply Clicked', event
+		# print 'Apply Clicked', event
+		self.opts.filterParameters['apply'] = True
 
 	def unapplyClicked(self, event):
-		print 'Unapply Clicked', event
+		# print 'Unapply Clicked', event
+		self.opts.filterParameters['apply'] = False
 
 	def updateLabels(self):
 		self.lowFreqLabel.setText('Low Freq: ' + str(self.opts.filterParameters['lowFreq']))
@@ -919,7 +941,7 @@ class filterGUI(object):
 		self.orderLabel.setText('Order: ' + str(self.opts.filterParameters['order']))
 
 	def runFilter(self):
-		data = getWaveDataSetFromSacItem(self.stkdh)
+		data = getWaveDataSetFromSacItem(self.stkdh, self.opts)
 		originalTime = data.x
 		originalSignalTime = data.y
 

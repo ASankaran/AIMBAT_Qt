@@ -6,6 +6,7 @@ from scipy import signal
 from qualctrl import getDataOpts
 
 from algiccs import ccWeightStack
+import filtering
 
 
 class DataItem(object):
@@ -39,10 +40,17 @@ def getDataSet():
 
 	# return data
 
-def getWaveDataSetFromSacItem(sacitem):
+def getWaveDataSetFromSacItem(sacitem, opts):
 	b = sacitem.b
 	npts = sacitem.npts
 	delta = sacitem.delta
 	x = linspace(b, b + npts * delta, npts)
 	y = array(sacitem.data)
+
+	if hasattr(opts, 'filterParameters') and opts.filterParameters['apply']:
+		originalTime = x
+		originalSignalTime = y
+		filteredSignalTime, filteredSignalFreq, adjusted_w, adjusted_h = filtering.filtering_time_freq(originalTime, originalSignalTime, opts.delta, opts.filterParameters['band'], opts.filterParameters['highFreq'], opts.filterParameters['lowFreq'], opts.filterParameters['order'], opts.filterParameters['reversepass'])
+		return DataItem(x, filteredSignalTime, sacitem.filename)
+
 	return DataItem(x, y, sacitem.filename)
