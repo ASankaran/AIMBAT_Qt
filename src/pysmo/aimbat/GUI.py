@@ -182,10 +182,13 @@ class mainGUI(object):
 			plotVB = plotItemClicked.getViewBox()
 			xpoint = plotVB.mapToView(event.pos()).x()
 			self.addTimePick(plotItemClicked, xpoint, hdrfin)
-			self.t2pick = xpoint
 
-			hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-			self.stkdh.sethdr(hdrfin, self.t2pick)
+			if plotItemClicked is self.stackedPlot:
+				self.t2pick = xpoint
+				hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+				self.stkdh.sethdr(hdrfin, self.t2pick)
+			else:
+				plotItemClicked.sacdh.thdrs[2] = xpoint
 			return
 
 		#If single click select / deselect a plot
@@ -506,11 +509,17 @@ class mainGUI(object):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 
 		if pick == hdrini:
-			plot.addLine(x = xVal, pen = (255, 255, 0))
+			if hasattr(plot, 't0Line'):
+				plot.removeItem(plot.t0Line)
+			plot.t0Line = plot.addLine(x = xVal, pen = (255, 255, 0))
 		elif pick == hdrmed:
-			plot.addLine(x = xVal, pen = (0, 0, 255))
+			if hasattr(plot, 't1Line'):
+				plot.removeItem(plot.t1Line)
+			plot.t1Line = plot.addLine(x = xVal, pen = (0, 0, 255))
 		elif pick == hdrfin:
-			plot.addLine(x = xVal, pen = (255, 140, 0))
+			if hasattr(plot, 't2Line'):
+				plot.removeItem(plot.t2Line)
+			plot.t2Line = plot.addLine(x = xVal, pen = (255, 140, 0))
 		else:
 			plot.addLine(x = xVal, pen = (255, 255, 255))
 		# plot.addLine(x = xVal)
