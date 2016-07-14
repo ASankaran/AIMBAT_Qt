@@ -19,7 +19,8 @@ Python module for the ICCS (iterative cross-correlation and stack) algorithm.
 
 from numpy import array, ones, zeros, sqrt, dot, corrcoef, sum, mean, transpose
 import os, sys, copy
-from matplotlib.mlab import l1norm, l2norm
+#from matplotlib.mlab import l1norm, l2norm
+from mathfunctions import l1norm, l2norm
 from optparse import OptionParser
 from ttconfig import CCConfig
 from qualsort import initQual, seleSeis
@@ -279,12 +280,13 @@ def coherence(datai, datas):
 
 
 def plotiter(stkdata):
-	import matplotlib.pyplot as plt
-	plt.figure()
-	for i in range(len(stkdata)):
-		plt.plot(stkdata[i], label='iter'+str(i))
-	plt.legend()
-	plt.show()
+	# import matplotlib.pyplot as plt
+	# plt.figure()
+	# for i in range(len(stkdata)):
+	# 	plt.plot(stkdata[i], label='iter'+str(i))
+	# plt.legend()
+	# plt.show()
+	pass
 
 def autoiccs(gsac, opts):
 	""" Run ICCS and delete low quality seismograms automatically.
