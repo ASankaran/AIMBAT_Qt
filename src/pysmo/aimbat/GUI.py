@@ -11,6 +11,8 @@ from algmccc import eventListName, mccc
 from sacpickle import taperWindow, saveData
 from qualsort import seleSeis, sortSeisQual, sortSeisHeader, sortSeisHeaderDiff
 
+from numpy import nan
+
 
 class mainGUI(object):
 	def __init__(self, sacgroup, opts):
@@ -153,6 +155,7 @@ class mainGUI(object):
 		savebtn.clicked.connect(self.saveButtonClicked)
 		sortbtn.clicked.connect(self.sortButtonClicked)
 		sacp2btn.clicked.connect(self.sacp2ButtonClicked)
+		filterbtn.clicked.connect(self.filterButtonClicked)
 
 		self.addWidget(alignbtn, 0, 0)
 		self.addWidget(syncbtn, 0, 1)
@@ -485,6 +488,10 @@ class mainGUI(object):
 		self.sacp2Window = sacp2GUI(self.sacgroup, self.opts)
 		self.sacp2Window.start()
 
+	def filterButtonClicked(self):
+		self.filterWindow = filterGUI(self.sacgroup, self.opts)
+		self.filterWindow.start()
+
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 
@@ -722,4 +729,147 @@ class sacp2GUI(object):
 
 	def mouseClickEvents(self, event):
 		print event.name()
+
+
+class filterGUI(object):
+	def __init__(self, sacgroup, opts):
+		self.sacgroup = sacgroup
+		self.opts = opts
+
+		self.filterWindow = QWidget()
+		self.filterWindow.setWindowTitle('Filtering')
+		self.filterWindow.show()
+		self.filterlayout = QGridLayout(self.filterWindow)
+
+	def start(self):
+		self.initGUI()
+		self.filterWindow.show()
+
+	def initGUI(self):
+		orderButtonWidget = QGroupBox('Order:')
+		orderButtonLayout = QVBoxLayout()
+		orderButtonWidget.setLayout(orderButtonLayout)
+
+		orderRadioButtons = [QRadioButton('1'), QRadioButton('2'), QRadioButton('3'), QRadioButton('4')]
+		orderButtonGroup = QButtonGroup()
+		for i in xrange(0, len(orderRadioButtons)):
+			orderButtonGroup.addButton(orderRadioButtons[i])
+			orderButtonLayout.addWidget(orderRadioButtons[i])
+		orderRadioButtons[1].setChecked(True)
+		orderButtonGroup.buttonClicked[QAbstractButton].connect(self.orderChanged)
+
+		filterButtonWidget = QGroupBox('Filter Type:')
+		filterButtonLayout = QVBoxLayout()
+		filterButtonWidget.setLayout(filterButtonLayout)
+
+		filterTypeRadioButtons = [QRadioButton('bandpass'), QRadioButton('lowpass'), QRadioButton('highpass')]
+		filterTypeButtonGroup = QButtonGroup()
+		for i in xrange(0, len(filterTypeRadioButtons)):
+			filterTypeButtonGroup.addButton(filterTypeRadioButtons[i])
+			filterButtonLayout.addWidget(filterTypeRadioButtons[i])
+		filterTypeRadioButtons[0].setChecked(True)
+		filterTypeButtonGroup.buttonClicked[QAbstractButton].connect(self.filterTypeChanged)
+
+		runReverseButtonWidget = QGroupBox('Run Reverse:')
+		runReverseButtonLayout = QVBoxLayout()
+		runReverseButtonWidget.setLayout(runReverseButtonLayout)
+
+		runReverseRadioButtons = [QRadioButton('yes'), QRadioButton('no')]
+		runReverseButtonGroup = QButtonGroup()
+		for i in xrange(0, len(runReverseRadioButtons)):
+			runReverseButtonGroup.addButton(runReverseRadioButtons[i])
+			runReverseButtonLayout.addWidget(runReverseRadioButtons[i])
+		runReverseRadioButtons[1].setChecked(True)
+		runReverseButtonGroup.buttonClicked[QAbstractButton].connect(self.runReverseChanged)
+
+		self.addWidget(orderButtonWidget, 0, 0)
+		self.addWidget(filterButtonWidget, 0, 1)
+		self.addWidget(runReverseButtonWidget, 0, 2)
+
+		applyWidget = QGroupBox('Apply / Unapply:')
+		applyLayout = QVBoxLayout()
+		applyWidget.setLayout(applyLayout)
+
+		applyButton = QPushButton('Apply')
+		unapplyButton = QPushButton('Unapply')
+		applyLayout.addWidget(applyButton)
+		applyLayout.addWidget(unapplyButton)
+		applyButton.clicked.connect(self.applyClicked)
+		unapplyButton.clicked.connect(self.unapplyClicked)
+
+		self.addWidget(applyWidget, 0, 3)
+
+		settingsWidget = QGroupBox('Settings:')
+		settingsLayout = QVBoxLayout()
+		settingsWidget.setLayout(settingsLayout)
+
+		self.lowFreqLabel = QLabel('Low Freq: ')
+		self.highFreqLabel = QLabel('High Freq: ')
+		self.orderLabel = QLabel('Order: ')
+		settingsLayout.addWidget(self.lowFreqLabel)
+		settingsLayout.addWidget(self.highFreqLabel)
+		settingsLayout.addWidget(self.orderLabel)
+
+		self.addWidget(settingsWidget, 0, 4)
+
+		filtergfxWidget = pg.GraphicsLayoutWidget()
+		filtergfxWidget.resize(1800, 1200)
+
+		plot1 = filtergfxWidget.addPlot(title = 'Signal vs. Time')
+		filtergfxWidget.nextRow()
+		plot2 = filtergfxWidget.addPlot(title = 'Frequency vs Amplitude')
+
+		self.addWidget(filtergfxWidget, 6, 0, 15, 5)
+
+		self.filterWindow.resize(1800, 1200)
+
+		# Write buttongroups to class variable so they don't get garbage collected and kill the signal
+		self.orderButtonGroup = orderButtonGroup
+		self.filterTypeButtonGroup = filterTypeButtonGroup
+		self.runReverseButtonGroup = runReverseButtonGroup
+
+		self.updateLabels()
+
+	def addWidget(self, widget, xLoc, yLoc, xSpan = 1, ySpan = 1):
+		self.filterlayout.addWidget(widget, xLoc, yLoc, xSpan, ySpan)
+
+	def orderChanged(self, event):
+		# print 'Order Changed', event.text()
+		self.opts.filterParameters['order'] = int(event.text())
+		self.updateLabels()
+
+	def filterTypeChanged(self, event):
+		# print 'Filter Type Changed', event.text()
+		self.opts.filterParameters['band'] = event.text()
+		if event.text() == 'bandpass':
+			self.opts.filterParameters['lowFreq'] = 0.05
+			self.opts.filterParameters['highFreq'] = 0.25
+			self.opts.filterParameters['advance'] = False
+		elif event.text() == 'lowpass':
+			self.opts.filterParameters['lowFreq'] = 0.05
+			self.opts.filterParameters['highFreq'] = nan
+			self.opts.filterParameters['advance'] = False
+		elif event.text() == 'highpass':
+			self.opts.filterParameters['lowFreq'] = nan
+			self.opts.filterParameters['highFreq'] = 0.25
+			self.opts.filterParameters['advance'] = False
+		self.updateLabels()
+
+	def runReverseChanged(self, event):
+		# print 'Run Reverse Changed', event.text()
+		if event.text() == 'yes':
+			self.opts.filterParameters['reversepass'] = True
+		elif event.text() == 'no':
+			self.opts.filterParameters['reversepass'] = False
+
+	def applyClicked(self, event):
+		print 'Apply Clicked', event
+
+	def unapplyClicked(self, event):
+		print 'Unapply Clicked', event
+
+	def updateLabels(self):
+		self.lowFreqLabel.setText('Low Freq: ' + str(self.opts.filterParameters['lowFreq']))
+		self.highFreqLabel.setText('High Freq: ' + str(self.opts.filterParameters['highFreq']))
+		self.orderLabel.setText('Order: ' + str(self.opts.filterParameters['order']))
 		

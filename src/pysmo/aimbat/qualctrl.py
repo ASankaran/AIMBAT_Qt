@@ -1217,6 +1217,7 @@ def getDataOpts():
 	filterParameters['lowFreq'] = 0.05
 	filterParameters['highFreq'] = 0.25
 	filterParameters['order'] = 2
+	filterParameters['reversepass'] = False
 	opts.filterParameters = filterParameters
 
 	# override defaults if already set in SAC files
