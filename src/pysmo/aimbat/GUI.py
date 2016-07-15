@@ -510,33 +510,19 @@ class mainGUI(object):
 
 	def mapstationsButtonClicked(self):
 		stationEntries = ''
-		latRange = [90, -90]
-		lonRange = [180, -180]
 
 		index = 1
 		for sacdh in self.sacgroup.saclist:
 			# print '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + ']'
-
-			if sacdh.stla < latRange[0]:
-				latRange[0] = sacdh.stla
-			elif sacdh.stla > latRange[1]:
-				latRange[1] = sacdh.stla
-			elif sacdh.stlo < lonRange[0]:
-				lonRange[0] = sacdh.stlo
-			elif sacdh.stlo > lonRange[1]:
-				lonRange[1] = sacdh.stlo
-
 			stationEntries += '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + '],\n'
 			index += 1
 		stationEntries = stationEntries[:-2]
-
-		latLonCenter = str((latRange[0] + latRange[1]) / 2.0) + ',' + str((lonRange[0] + lonRange[1]) / 2.0)
 
 		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 		with open(os.path.join(__location__, 'gmapstemplate.html'), 'r') as templateFile:
 			htmlMap = templateFile.read()
-		htmlMap = htmlMap % (stationEntries, latLonCenter)
+		htmlMap = htmlMap % (stationEntries)
 		with open(os.path.join(os.path.expanduser('~'), 'tmpfile.html'), 'w+') as tmpfile:
 			tmpfile.write(htmlMap)
 

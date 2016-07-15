@@ -13,10 +13,10 @@
     ];
 
     var map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 5,
-      center: new google.maps.LatLng(%s),
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });
+
+    var bounds = new google.maps.LatLngBounds();
 
     var infowindow = new google.maps.InfoWindow();
 
@@ -28,6 +28,8 @@
         map: map
       });
 
+      bounds.extend(marker.getPosition());
+
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
         return function() {
           infowindow.setContent(locations[i][0]);
@@ -35,6 +37,8 @@
         }
       })(marker, i));
     }
+
+    map.fitBounds(bounds);
   </script>
 </body>
 </html>
