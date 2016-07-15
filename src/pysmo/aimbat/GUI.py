@@ -4,6 +4,8 @@ from PyQt4.QtCore import *
 import pyqtgraph as pg
 
 import sys
+import os
+import webbrowser
 
 from seismodata import getWaveDataSetFromSacItem
 from algiccs import ccWeightStack
@@ -158,6 +160,7 @@ class mainGUI(object):
 		sortbtn.clicked.connect(self.sortButtonClicked)
 		sacp2btn.clicked.connect(self.sacp2ButtonClicked)
 		filterbtn.clicked.connect(self.filterButtonClicked)
+		mapstationsbtn.clicked.connect(self.mapstationsButtonClicked)
 
 		self.addWidget(alignbtn, 0, 0)
 		self.addWidget(syncbtn, 0, 1)
@@ -504,6 +507,40 @@ class mainGUI(object):
 		self.filterWindow.start()
 		self.filterWindow.applyButton.clicked.connect(self.redrawPlots)
 		self.filterWindow.unapplyButton.clicked.connect(self.redrawPlots)
+
+	def mapstationsButtonClicked(self):
+		stationEntries = ''
+		latRange = [90, -90]
+		lonRange = [180, -180]
+
+		index = 1
+		for sacdh in self.sacgroup.saclist:
+			# print '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + ']'
+
+			if sacdh.stla < latRange[0]:
+				latRange[0] = sacdh.stla
+			elif sacdh.stla > latRange[1]:
+				latRange[1] = sacdh.stla
+			elif sacdh.stlo < lonRange[0]:
+				lonRange[0] = sacdh.stlo
+			elif sacdh.stlo > lonRange[1]:
+				lonRange[1] = sacdh.stlo
+
+			stationEntries += '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + '],\n'
+			index += 1
+		stationEntries = stationEntries[:-2]
+
+		latLonCenter = str((latRange[0] + latRange[1]) / 2.0) + ',' + str((lonRange[0] + lonRange[1]) / 2.0)
+
+		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+		with open(os.path.join(__location__, 'gmapstemplate.html'), 'r') as templateFile:
+			htmlMap = templateFile.read()
+		htmlMap = htmlMap % (stationEntries, latLonCenter)
+		with open(os.path.join(os.path.expanduser('~'), 'tmpfile.html'), 'w+') as tmpfile:
+			tmpfile.write(htmlMap)
+
+		webbrowser.open('file://' + os.path.join(os.path.expanduser('~'), 'tmpfile.html'), new = 1)
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
