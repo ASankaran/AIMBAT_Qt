@@ -116,8 +116,12 @@ class mainGUI(object):
 
 		# Create stacked plot
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-		self.opts.ccpara.cchdrs = [hdrini, hdrmed]
-		stkdh, stkdata, quas = ccWeightStack(self.sacgroup.saclist, self.opts)
+		if 'stkdh' in self.sacgroup.__dict__:
+			stkdh = self.sacgroup.stkdh
+		else:
+			self.opts.ccpara.cchdrs = [hdrini, hdrmed]
+			stkdh, stkdata, quas = ccWeightStack(self.sacgroup.saclist, self.opts)
+		
 		self.stkdh = stkdh
 		dataSet = getWaveDataSetFromSacItem(stkdh, self.opts)
 		plt = gfxWidget.addPlot(title = dataSet.name)
@@ -127,6 +131,12 @@ class mainGUI(object):
 		plt.hideAxis('left')
 		plt.sacdh = stkdh
 		plt.sacdh.selected = True
+
+		self.addTimePick(plt, stkdh.gethdr(hdrini), hdrini)
+		self.addTimePick(plt, stkdh.gethdr(hdrmed), hdrmed)
+		if stkdh.gethdr(hdrfin) != -12345.0:
+			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
+		# print stkdh.gethdr(hdrini), stkdh.gethdr(hdrmed), stkdh.gethdr(hdrfin)
 
 		self.stackedPlot = plt
 
@@ -145,6 +155,7 @@ class mainGUI(object):
 				# print 'In Selist'
 				brush = (255, 0, 0, 75)
 				isSelected = True
+				self.selectedIndexes.append(index)
 			else:
 				# print 'Not in Selist'
 				brush = (0, 255, 0, 75)
@@ -153,11 +164,17 @@ class mainGUI(object):
 			plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = brush)
 			plt.curves[0].selected = isSelected
 			plt.index = index
-			self.selectedIndexes.append(index)
 			plt.hideAxis('bottom')
 			plt.hideAxis('left')
 			plt.sacdh = sacitem
 			plt.sacdh.selected = isSelected
+
+			self.addTimePick(plt, sacitem.gethdr(hdrini), hdrini)
+			self.addTimePick(plt, sacitem.gethdr(hdrmed), hdrmed)
+			if sacitem.gethdr(hdrfin) != -12345.0:
+				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
+			# print sacitem.gethdr(hdrini), sacitem.gethdr(hdrmed), sacitem.gethdr(hdrfin)
+
 			gfxWidget.nextRow()
 			index += 1
 			self.plotList.append(plt)
