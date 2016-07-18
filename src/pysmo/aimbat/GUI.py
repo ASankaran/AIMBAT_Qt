@@ -107,6 +107,8 @@ class mainGUI(object):
 
 		# print 'Data Window:', getWaveDataSetFromSacItem(self.stkdh, self.opts).x[0], getWaveDataSetFromSacItem(self.stkdh, self.opts).x[-1]
 		# print 'Set Timewindow:', timewindow
+		out = 'File {:s}: set time window to {:s} and {:s}: {:6.1f} - {:6.1f} s'
+		print(out.format(self.stkdh.filename, twh0, twh1, timewindow[0], timewindow[1]))
 
 	def getPlotGraphicsLayoutWindow(self, xSize, ySize):
 		gfxWidget = pg.GraphicsLayoutWidget()
