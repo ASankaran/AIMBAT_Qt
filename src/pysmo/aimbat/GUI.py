@@ -76,7 +76,7 @@ class mainGUI(object):
 	def setWindow(self, arg):
 		timewindow = arg.state['viewRange'][0]
 		self.stackedPlot.setYRange(*self.originalStackedPlotRanges['y'])
-		self.selectedWindow = timewindow
+
 		# confirmDiag = QMessageBox()
 		# confirmDiag.setText("Set selected area as window?")
 		# confirmDiag.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
@@ -88,10 +88,18 @@ class mainGUI(object):
 		# elif userInput == QMessageBox.Cancel:
 		# 	pass
 
+		# Don't update window if plot is autosizing to fit all data
+		waveData = getWaveDataSetFromSacItem(self.stkdh, self.opts).x
+		if timewindow[1] - timewindow[0] > waveData[-1] - waveData[0]:
+			return
+
+		self.selectedWindow = timewindow
+
 		twh0, twh1 = self.opts.pppara.twhdrs
 		self.stkdh.sethdr(twh0, timewindow[0])
 		self.stkdh.sethdr(twh1, timewindow[1])
 
+		# print 'Data Window:', getWaveDataSetFromSacItem(self.stkdh, self.opts).x[0], getWaveDataSetFromSacItem(self.stkdh, self.opts).x[-1]
 		# print 'Set Timewindow:', timewindow
 
 	def getPlotGraphicsLayoutWindow(self, xSize, ySize):
