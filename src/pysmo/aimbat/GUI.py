@@ -29,6 +29,12 @@ class mainGUI(object):
 		self.sacgroup = sacgroup
 		self.opts = opts
 
+		if not hasattr(self.sacgroup, 'selist'):
+			self.sacgroup.selist = []
+			self.sacgroup.delist = []
+			for sacitem in self.sacgroup.saclist:
+				self.sacgroup.selist.append(sacitem)
+
 		self.stkdh = None
 		self.stackedPlot = None
 		self.originalStackedPlotRanges = {'x' : [0, 0], 'y' : [0, 0]}
@@ -129,14 +135,27 @@ class mainGUI(object):
 		for sacitem in self.sacgroup.saclist:
 			dataSet = getWaveDataSetFromSacItem(sacitem, self.opts)
 			plt = gfxWidget.addPlot(title = dataSet.name)
-			plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
-			plt.curves[0].selected = True
+
+			brush = None
+			isSelected = None
+
+			if sacitem in self.sacgroup.selist:
+				# print 'In Selist'
+				brush = (255, 0, 0, 75)
+				isSelected = True
+			else:
+				# print 'Not in Selist'
+				brush = (0, 255, 0, 75)
+				isSelected = False
+
+			plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = brush)
+			plt.curves[0].selected = isSelected
 			plt.index = index
 			self.selectedIndexes.append(index)
 			plt.hideAxis('bottom')
 			plt.hideAxis('left')
 			plt.sacdh = sacitem
-			plt.sacdh.selected = True
+			plt.sacdh.selected = isSelected
 			gfxWidget.nextRow()
 			index += 1
 			self.plotList.append(plt)
