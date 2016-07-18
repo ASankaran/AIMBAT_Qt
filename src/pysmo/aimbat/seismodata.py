@@ -44,7 +44,7 @@ def getWaveDataSetFromSacItem(sacitem, opts):
 	b = sacitem.b
 	npts = sacitem.npts
 	delta = sacitem.delta
-	x = linspace(b, b + npts * delta, npts)
+	x = linspace(b, b + (npts - 1) * delta, npts)
 	y = array(sacitem.data)
 
 	if hasattr(opts, 'filterParameters') and opts.filterParameters['apply']:
@@ -53,4 +53,30 @@ def getWaveDataSetFromSacItem(sacitem, opts):
 		filteredSignalTime, filteredSignalFreq, adjusted_w, adjusted_h = filtering.filtering_time_freq(originalTime, originalSignalTime, opts.delta, opts.filterParameters['band'], opts.filterParameters['highFreq'], opts.filterParameters['lowFreq'], opts.filterParameters['order'], opts.filterParameters['reversepass'])
 		return DataItem(x, filteredSignalTime, sacitem.filename)
 
+	twh0, twh1 = opts.pppara.twhdrs
+	tw0 = sacitem.gethdr(twh0)
+	tw1 = sacitem.gethdr(twh1)
+	twindow = [tw0, tw1]
+
+	if opts.ynorm > 0:
+		if opts.ynormtwin_on:
+			try:
+				indmin, indmax = numpy.searchsorted(x, twindow)
+				indmax = min(len(x) - 1, indmax)
+				thisd = y[indmin : indmax + 1]
+				dnorm = dataNorm(thisd)
+			except:
+				dnorm = dataNorm(y)
+		else:
+			dnorm = dataNorm(y)
+		dnorm = 1 / dnorm * opts.ynorm * .5
+	else:
+		dnorm = 1
+	y = y * dnorm
+
 	return DataItem(x, y, sacitem.filename)
+
+def dataNorm(d, w=0.05):
+	dmin, dmax = d.min(), d.max()
+	dnorm = max(-dmin, dmax) * (1+w)
+	return dnorm
