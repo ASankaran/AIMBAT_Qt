@@ -64,7 +64,11 @@ class mainGUI(object):
 		self.stackedPlot.enableAutoRange('x', True)
 		self.originalStackedPlotRanges['x'] = self.stackedPlot.viewRange()[0]
 		self.originalStackedPlotRanges['y'] = self.stackedPlot.viewRange()[1]
-		self.stackedPlot.enableAutoRange('x', True)
+		self.stackedPlot.enableAutoRange('x', False)
+
+		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		if self.stkdh.gethdr(hdrfin) != -12345.0:
+			self.stackedPlot.setXRange(self.opts.ccpara.twcorr[0] + self.stackedPlot.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + self.stackedPlot.sacdh.gethdr(hdrfin))
 
 		# print self.originalStackedPlotRanges
 
@@ -136,6 +140,7 @@ class mainGUI(object):
 		self.addTimePick(plt, stkdh.gethdr(hdrmed), hdrmed)
 		if stkdh.gethdr(hdrfin) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
+			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 		# print stkdh.gethdr(hdrini), stkdh.gethdr(hdrmed), stkdh.gethdr(hdrfin)
 
 		self.stackedPlot = plt
@@ -173,6 +178,7 @@ class mainGUI(object):
 			self.addTimePick(plt, sacitem.gethdr(hdrmed), hdrmed)
 			if sacitem.gethdr(hdrfin) != -12345.0:
 				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
+				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 			# print sacitem.gethdr(hdrini), sacitem.gethdr(hdrmed), sacitem.gethdr(hdrfin)
 
 			gfxWidget.nextRow()
