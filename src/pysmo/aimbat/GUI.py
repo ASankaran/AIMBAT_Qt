@@ -244,7 +244,6 @@ class mainGUI(object):
 				self.stkdh.sethdr(hdrfin, self.t2pick)
 			else:
 				plotItemClicked.sacdh.thdrs[2] = xpoint
-			return
 
 		#If single click select / deselect a plot
 		if plotItemClicked is self.stackedPlot:
