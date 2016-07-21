@@ -792,10 +792,10 @@ class sacp2GUI(object):
 		plot4 = sacp2gfxWidget.addPlot(title = 'Plot T3')
 		sacp2gfxWidget.nextRow()
 
+		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+
 		for sacdh in self.sacgroup.selist:
 			dataSet = getWaveDataSetFromSacItem(sacdh, self.opts)
-
-			hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 
 			shiftT0 = sacdh.gethdr(hdrini)
 			shiftT1 = sacdh.gethdr(hdrmed)
@@ -807,6 +807,21 @@ class sacp2GUI(object):
 			shiftedXT2 = [val - shiftT2 for val in dataSet.x]
 			shiftedXT3 = [val - shiftT3 for val in dataSet.x]
 
+			# Only plot datapoints that will be in range of window. Doesn't look like it makes a meaningful speed difference
+			# if sacdh.gethdr(hdrfin) != -12345.0:
+			# 	startIndexes = [0, 0, 0, 0]
+			# 	endIndexes = [len(shiftedXT0) - 1, len(shiftedXT1) - 1, len(shiftedXT2) - 1, len(shiftedXT3) - 1]
+			# 	for index, xValsList in enumerate([shiftedXT0, shiftedXT1, shiftedXT2, shiftedXT3]):
+			# 		while xValsList[startIndexes[index]] < self.opts.ccpara.twcorr[0]:
+			# 			startIndexes[index] += 1
+			# 		while xValsList[endIndexes[index]] > self.opts.ccpara.twcorr[1]:
+			# 			endIndexes[index] -= 1
+
+			# pltItem1 = plot1.plot(shiftedXT0[startIndexes[0] : endIndexes[0]], dataSet.y[startIndexes[0] : endIndexes[0]])
+			# pltItem2 = plot2.plot(shiftedXT1[startIndexes[1] : endIndexes[1]], dataSet.y[startIndexes[1] : endIndexes[1]])
+			# pltItem3 = plot3.plot(shiftedXT2[startIndexes[2] : endIndexes[2]], dataSet.y[startIndexes[2] : endIndexes[2]])
+			# pltItem4 = plot4.plot(shiftedXT3[startIndexes[3] : endIndexes[3]], dataSet.y[startIndexes[3] : endIndexes[3]])
+
 			pltItem1 = plot1.plot(shiftedXT0, dataSet.y)
 			pltItem2 = plot2.plot(shiftedXT1, dataSet.y)
 			pltItem3 = plot3.plot(shiftedXT2, dataSet.y)
@@ -816,6 +831,12 @@ class sacp2GUI(object):
 			pltItem2.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
 			pltItem3.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
 			pltItem4.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
+
+		if self.sacgroup.selist[0].gethdr(hdrfin) != -12345.0:
+			plot1.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
+			plot2.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
+			plot3.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
+			plot4.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
 
 		plot1.hideAxis('bottom')
 		plot1.hideAxis('left')
