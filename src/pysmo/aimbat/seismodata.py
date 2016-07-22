@@ -51,7 +51,7 @@ def getWaveDataSetFromSacItem(sacitem, opts):
 		originalTime = x
 		originalSignalTime = y
 		filteredSignalTime, filteredSignalFreq, adjusted_w, adjusted_h = filtering.filtering_time_freq(originalTime, originalSignalTime, opts.delta, opts.filterParameters['band'], opts.filterParameters['highFreq'], opts.filterParameters['lowFreq'], opts.filterParameters['order'], opts.filterParameters['reversepass'])
-		return DataItem(x, filteredSignalTime, sacitem.filename)
+		return DataItem(x, filteredSignalTime, sacitem.netsta)
 
 	twh0, twh1 = opts.pppara.twhdrs
 	tw0 = sacitem.gethdr(twh0)
@@ -74,7 +74,7 @@ def getWaveDataSetFromSacItem(sacitem, opts):
 		dnorm = 1
 	y = y * dnorm
 
-	return DataItem(x, y, sacitem.filename)
+	return DataItem(x, y, sacitem.netsta)
 
 def dataNorm(d, w=0.05):
 	dmin, dmax = d.min(), d.max()

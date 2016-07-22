@@ -143,6 +143,8 @@ class mainGUI(object):
 			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 		# print stkdh.gethdr(hdrini), stkdh.gethdr(hdrmed), stkdh.gethdr(hdrfin)
 
+		plt.setTitle(plt.titleLabel.text, color = 'r')
+
 		self.stackedPlot = plt
 
 		gfxWidget.nextRow()
@@ -161,10 +163,14 @@ class mainGUI(object):
 				brush = (255, 0, 0, 75)
 				isSelected = True
 				self.selectedIndexes.append(index)
+
+				plt.setTitle(plt.titleLabel.text, color = 'r')
 			else:
 				# print 'Not in Selist'
 				brush = (0, 255, 0, 75)
 				isSelected = False
+
+				plt.setTitle(plt.titleLabel.text, color = 'g')
 
 			plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = brush)
 			plt.curves[0].selected = isSelected
@@ -253,6 +259,7 @@ class mainGUI(object):
 			for curve in plotItemClicked.curves:
 				curve.setFillBrush((0, 255, 0, 75))
 				curve.selected = False
+			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = 'g')
 			# plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 			# plotItemClicked.curves[0].selected = False
 			self.selectedIndexes.remove(plotItemClicked.index)
@@ -263,6 +270,7 @@ class mainGUI(object):
 			for curve in plotItemClicked.curves:
 				curve.setFillBrush((255, 0, 0, 75))
 				curve.selected = True
+			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = 'r')
 			# plotItemClicked.curves[0].setFillBrush((255, 0, 0, 75))
 			# plotItemClicked.curves[0].selected = True
 			self.selectedIndexes.append(plotItemClicked.index)
