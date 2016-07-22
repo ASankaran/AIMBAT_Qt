@@ -593,17 +593,17 @@ class mainGUI(object):
 		if pick == hdrini:
 			if hasattr(plot, 't0Line'):
 				plot.removeItem(plot.t0Line)
-			plot.t0Line = plot.addLine(x = xVal, pen = (255, 255, 0))
+			plot.t0Line = plot.addLine(x = xVal, pen = {'color' : (255, 255, 0), 'width' : 2})
 		elif pick == hdrmed:
 			if hasattr(plot, 't1Line'):
 				plot.removeItem(plot.t1Line)
-			plot.t1Line = plot.addLine(x = xVal, pen = (0, 0, 255))
+			plot.t1Line = plot.addLine(x = xVal, pen = {'color' : (0, 0, 255), 'width' : 2})
 		elif pick == hdrfin:
 			if hasattr(plot, 't2Line'):
 				plot.removeItem(plot.t2Line)
-			plot.t2Line = plot.addLine(x = xVal, pen = (255, 140, 0))
+			plot.t2Line = plot.addLine(x = xVal, pen = {'color' : (255, 140, 0), 'width' : 2})
 		else:
-			plot.addLine(x = xVal, pen = (255, 255, 255))
+			plot.addLine(x = xVal, pen = {'color' : (255, 255, 255), width : 2})
 		# plot.addLine(x = xVal)
 
 	def getWindow(self, hdr):
