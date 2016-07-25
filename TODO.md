@@ -7,8 +7,6 @@ Uncompleted
 - Use different fill colors for when the wave is above / below the zero line
 - Incrementally load plots to decrease load time
 - Resample data at lower rate when creating SAC P2 to decrease load time
-- read colors of pick lines from ttconfig
-- read colors of selected / deselected seismograms from ttconfig
 - Use GMT for plotting stations
 - Decrease padding between plots
 - Add lines between plots
@@ -22,3 +20,5 @@ Completed
 - Show station names instead of file names
 - Scale waves based on visable window
 - Color titles to match waves
+- read colors of pick lines from ttconfig
+- read colors of selected / deselected seismograms from ttconfig

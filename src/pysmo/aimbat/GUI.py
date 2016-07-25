@@ -13,6 +13,7 @@ from algmccc import eventListName, mccc
 from sacpickle import taperWindow, saveData
 from qualsort import seleSeis, sortSeisQual, sortSeisHeader, sortSeisHeaderDiff
 import filtering
+import utils
 
 import numpy as np
 from numpy import nan
@@ -139,7 +140,7 @@ class mainGUI(object):
 		self.stkdh = stkdh
 		dataSet = getWaveDataSetFromSacItem(stkdh, self.opts)
 		plt = gfxWidget.addPlot(title = dataSet.name)
-		plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+		plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 		plt.curves[0].selected = True
 		plt.hideAxis('bottom')
 		plt.hideAxis('left')
@@ -156,7 +157,7 @@ class mainGUI(object):
 		plt.setXRange(stkdh.gethdr(hdrmed) + self.opts.xlimit[0], stkdh.gethdr(hdrmed) + self.opts.xlimit[1])
 		self.scalePlotYRange(plt)
 
-		plt.setTitle(plt.titleLabel.text, color = 'r')
+		plt.setTitle(plt.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 
 		self.stackedPlot = plt
 
@@ -173,17 +174,17 @@ class mainGUI(object):
 
 			if sacitem in self.sacgroup.selist:
 				# print 'In Selist'
-				brush = (255, 0, 0, 75)
+				brush = utils.convertToRGBA(self.opts.pppara.colorwave, 75)
 				isSelected = True
 				self.selectedIndexes.append(index)
 
-				plt.setTitle(plt.titleLabel.text, color = 'r')
+				plt.setTitle(plt.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 			else:
 				# print 'Not in Selist'
-				brush = (0, 255, 0, 75)
+				brush = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75)
 				isSelected = False
 
-				plt.setTitle(plt.titleLabel.text, color = 'g')
+				plt.setTitle(plt.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
 
 			plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = brush)
 			plt.curves[0].selected = isSelected
@@ -273,9 +274,9 @@ class mainGUI(object):
 
 		if plotItemClicked.sacdh.selected:
 			for curve in plotItemClicked.curves:
-				curve.setFillBrush((0, 255, 0, 75))
+				curve.setFillBrush(utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
 				curve.selected = False
-			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = 'g')
+			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
 			# plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 			# plotItemClicked.curves[0].selected = False
 			self.selectedIndexes.remove(plotItemClicked.index)
@@ -284,9 +285,9 @@ class mainGUI(object):
 			self.sacgroup.delist.append(plotItemClicked.sacdh)
 		else:
 			for curve in plotItemClicked.curves:
-				curve.setFillBrush((255, 0, 0, 75))
+				curve.setFillBrush(utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 				curve.selected = True
-			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = 'r')
+			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 			# plotItemClicked.curves[0].setFillBrush((255, 0, 0, 75))
 			# plotItemClicked.curves[0].selected = True
 			self.selectedIndexes.append(plotItemClicked.index)
@@ -323,7 +324,7 @@ class mainGUI(object):
 		# Recreate stacked plot
 		self.stackedPlot.clearPlots()
 		dataSet = getWaveDataSetFromSacItem(self.stkdh, self.opts)
-		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 		self.stackedPlot.curves[0].selected = True
 		self.stackedPlot.hideAxis('bottom')
 		self.stackedPlot.hideAxis('left')
@@ -633,15 +634,15 @@ class mainGUI(object):
 		if pick == hdrini:
 			if hasattr(plot, 't0Line'):
 				plot.removeItem(plot.t0Line)
-			plot.t0Line = plot.addLine(x = xVal, pen = {'color' : (255, 255, 0), 'width' : 2})
+			plot.t0Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[0]), 'width' : 2})
 		elif pick == hdrmed:
 			if hasattr(plot, 't1Line'):
 				plot.removeItem(plot.t1Line)
-			plot.t1Line = plot.addLine(x = xVal, pen = {'color' : (0, 0, 255), 'width' : 2})
+			plot.t1Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[1]), 'width' : 2})
 		elif pick == hdrfin:
 			if hasattr(plot, 't2Line'):
 				plot.removeItem(plot.t2Line)
-			plot.t2Line = plot.addLine(x = xVal, pen = {'color' : (255, 140, 0), 'width' : 2})
+			plot.t2Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[2]), 'width' : 2})
 		else:
 			plot.addLine(x = xVal, pen = {'color' : (255, 255, 255), width : 2})
 		# plot.addLine(x = xVal)
@@ -803,7 +804,7 @@ class mainGUI(object):
 		for curve in self.stackedPlot.curves:
 			curve.clear()
 		# self.stackedPlot.curves[0].clear()
-		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 		self.scalePlotYRange(self.stackedPlot)
 
 		for plt in self.plotList:
@@ -812,9 +813,9 @@ class mainGUI(object):
 				curve.clear()
 			# plt.curves[0].clear()
 			if plt.sacdh.selected:
-				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 			else:
-				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (0, 255, 0, 75))
+				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
 			self.scalePlotYRange(plt)
 
 
