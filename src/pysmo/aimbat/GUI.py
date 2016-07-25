@@ -238,16 +238,16 @@ class mainGUI(object):
 		filterbtn.clicked.connect(self.filterButtonClicked)
 		mapstationsbtn.clicked.connect(self.mapstationsButtonClicked)
 
-		self.addWidget(alignbtn, 0, 0)
-		self.addWidget(syncbtn, 0, 1)
-		self.addWidget(refinebtn, 0, 2)
-		self.addWidget(finalizebtn, 0, 3)
-		self.addWidget(savebtn, 0, 4)
-		self.addWidget(quitbtn, 0, 5)
+		self.addWidget(alignbtn, 0, 1)
+		self.addWidget(syncbtn, 0, 2)
+		self.addWidget(refinebtn, 0, 3)
+		self.addWidget(finalizebtn, 0, 4)
+		self.addWidget(savebtn, 0, 8)
+		self.addWidget(quitbtn, 0, 9)
 		self.addWidget(sacp2btn, 0, 6)
-		self.addWidget(sortbtn, 0, 7)
-		self.addWidget(filterbtn, 0, 8)
-		self.addWidget(mapstationsbtn, 0, 9)
+		self.addWidget(sortbtn, 0, 5)
+		self.addWidget(filterbtn, 0, 0)
+		self.addWidget(mapstationsbtn, 0, 7)
 
 	def mouseClickEvents(self, event):
 		plotItemClicked = None
