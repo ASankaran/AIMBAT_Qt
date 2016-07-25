@@ -8,7 +8,6 @@ Uncompleted
 - Incrementally load plots to decrease load time
 - Resample data at lower rate when creating SAC P2 to decrease load time
 - Use GMT for plotting stations
-- Decrease padding between plots
 - Add lines between plots
 - Reorder buttons to a more natural order
 - Update Setup.py, to not conflict with the original AIMBAT
@@ -22,3 +21,4 @@ Completed
 - Color titles to match waves
 - read colors of pick lines from ttconfig
 - read colors of selected / deselected seismograms from ttconfig
+- Decrease padding between plots

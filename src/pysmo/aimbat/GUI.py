@@ -128,6 +128,7 @@ class mainGUI(object):
 	def getPlotGraphicsLayoutWindow(self, xSize, ySize):
 		gfxWidget = pg.GraphicsLayoutWidget()
 		gfxWidget.resize(xSize, ySize)
+		gfxWidget.ci.setSpacing(0)
 
 		# Create stacked plot
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
