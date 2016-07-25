@@ -879,10 +879,10 @@ class sacp2GUI(object):
 			pltItem3 = plot3.plot(shiftedXT2, dataSet.y)
 			pltItem4 = plot4.plot(shiftedXT3, dataSet.y)
 
-			pltItem1.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
-			pltItem2.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
-			pltItem3.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
-			pltItem4.curve.opts['name'] = getWaveDataSetFromSacItem(sacdh, self.opts).name
+			pltItem1.curve.opts['name'] = dataSet.name
+			pltItem2.curve.opts['name'] = dataSet.name
+			pltItem3.curve.opts['name'] = dataSet.name
+			pltItem4.curve.opts['name'] = dataSet.name
 
 		if self.sacgroup.selist[0].gethdr(hdrfin) != -12345.0:
 			plot1.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
