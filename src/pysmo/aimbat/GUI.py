@@ -37,7 +37,7 @@ class mainGUI(object):
 
 		self.stkdh = None
 		self.stackedPlot = None
-		self.originalStackedPlotRanges = {'x' : [0, 0], 'y' : [0, 0]}
+		# self.originalStackedPlotRanges = {'x' : [0, 0], 'y' : [0, 0]}
 
 		self.selectedWindow = [0, 0]
 		self.t2pick = 0
@@ -61,15 +61,17 @@ class mainGUI(object):
 
 		self.gfxWidget.scene().sigMouseClicked.connect(self.mouseClickEvents)
 
-		self.stackedPlot.enableAutoRange('x', True)
-		self.originalStackedPlotRanges['x'] = self.stackedPlot.viewRange()[0]
-		self.originalStackedPlotRanges['y'] = self.stackedPlot.viewRange()[1]
-		self.stackedPlot.enableAutoRange('x', False)
+		# self.stackedPlot.enableAutoRange('x', True)
+		# self.originalStackedPlotRanges['x'] = self.stackedPlot.viewRange()[0]
+		# self.originalStackedPlotRanges['y'] = self.stackedPlot.viewRange()[1]
+		# self.stackedPlot.enableAutoRange('x', False)
 
-		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-		if self.stkdh.gethdr(hdrfin) != -12345.0:
-			self.stackedPlot.setXRange(self.opts.ccpara.twcorr[0] + self.stackedPlot.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + self.stackedPlot.sacdh.gethdr(hdrfin))
-
+		# hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		# if self.stkdh.gethdr(hdrfin) != -12345.0:
+		# 	self.stackedPlot.setXRange(self.opts.ccpara.twcorr[0] + self.stackedPlot.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + self.stackedPlot.sacdh.gethdr(hdrfin))
+		# else:
+		# 	self.stackedPlot.setXRange(self.stackedPlot.sacdh.gethdr(hdrmed) + self.opts.xlimit[0], self.stackedPlot.sacdh.gethdr(hdrmed) + self.opts.xlimit[1])
+		# self.scalePlotYRange(self.stackedPlot)
 		# print self.originalStackedPlotRanges
 
 		# hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
@@ -85,7 +87,8 @@ class mainGUI(object):
 
 	def setWindow(self, arg):
 		timewindow = arg.state['viewRange'][0]
-		self.stackedPlot.setYRange(*self.originalStackedPlotRanges['y'])
+		# self.stackedPlot.setYRange(*self.originalStackedPlotRanges['y'])
+		self.scalePlotYRange(self.stackedPlot)
 
 		# confirmDiag = QMessageBox()
 		# confirmDiag.setText("Set selected area as window?")
@@ -102,6 +105,13 @@ class mainGUI(object):
 		waveData = getWaveDataSetFromSacItem(self.stkdh, self.opts).x
 		if timewindow[1] - timewindow[0] > waveData[-1] - waveData[0]:
 			return
+		# Don't update window if plot is autosizing to fit around t2
+		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		if self.stkdh.gethdr(hdrfin) != -12345.0:
+			if self.stkdh.gethdr(hdrfin) - 30 - 5 <= timewindow[0] <= self.stkdh.gethdr(hdrfin) - 30 + 5:
+				return
+			elif self.stkdh.gethdr(hdrfin) + 30 - 5 <= timewindow[1] <= self.stkdh.gethdr(hdrfin) + 30 + 5:
+				return
 
 		self.selectedWindow = timewindow
 
@@ -142,6 +152,9 @@ class mainGUI(object):
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
 			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 		# print stkdh.gethdr(hdrini), stkdh.gethdr(hdrmed), stkdh.gethdr(hdrfin)
+
+		plt.setXRange(stkdh.gethdr(hdrmed) + self.opts.xlimit[0], stkdh.gethdr(hdrmed) + self.opts.xlimit[1])
+		self.scalePlotYRange(plt)
 
 		plt.setTitle(plt.titleLabel.text, color = 'r')
 
@@ -186,6 +199,9 @@ class mainGUI(object):
 				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
 				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 			# print sacitem.gethdr(hdrini), sacitem.gethdr(hdrmed), sacitem.gethdr(hdrfin)
+
+			plt.setXRange(sacitem.gethdr(hdrmed) + self.opts.xlimit[0], sacitem.gethdr(hdrmed) + self.opts.xlimit[1])
+			self.scalePlotYRange(plt)
 
 			gfxWidget.nextRow()
 			index += 1
@@ -280,6 +296,22 @@ class mainGUI(object):
 		#plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
 		#self.gfxWidget.removeItem(plotItemClicked)
 
+	def scalePlotYRange(self, plt):
+		xRange = plt.viewRange()[0]
+		dataSet = getWaveDataSetFromSacItem(plt.sacdh, self.opts)
+		startXIndex = 0
+		endXIndex = len(dataSet.x)
+		for index in xrange(0, len(dataSet.x)):
+			startXIndex = index
+			if dataSet.x[index] > xRange[0]:
+				break
+		for index in xrange(len(dataSet.x) - 1, -1, -1):
+			endXIndex = index
+			if dataSet.x[index] < xRange[1]:
+				break
+		yData = dataSet.y[startXIndex : endXIndex]
+		plt.setYRange(min(yData), max(yData))
+
 	def alignButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 		self.opts.ccpara.cchdrs = hdrini, hdrmed
@@ -313,6 +345,8 @@ class mainGUI(object):
 		self.syncPick()
 		self.syncWindow()
 
+		self.stackedPlot.setXRange(self.stkdh.gethdr(hdrfin) + self.opts.xlimit[0], self.stkdh.gethdr(hdrfin) + self.opts.xlimit[1])
+
 		twfin = self.opts.ccpara.twcorr
 		for plt in self.plotList:
 			sacdh = plt.sacdh
@@ -325,7 +359,13 @@ class mainGUI(object):
 			th0 = tfin + twfin[0]
 			th1 = tfin + twfin[1]
 			# pp.twindow = [th0, th1]
-			plt.setXRange(th0, th1)
+			#plt.setXRange(th0, th1)
+			wh0, wh1 = self.opts.qcpara.twhdrs
+			w0 = sacdh.gethdr(wh0)
+			w1 = sacdh.gethdr(wh1)
+			plt.setXRange(w0, w1)
+			# print th0, th1
+			# print w0, w1
 			# pp.resetWindow()
 		print '--> Sync final time picks and time window... You can now run CCFF to refine final picks.'
 
@@ -674,8 +714,10 @@ class mainGUI(object):
 		twfin = self.opts.ccpara.twcorr
 		for sacdh in self.sacgroup.saclist:
 			tfin = sacdh.gethdr(hdrfin)
-			th0 = tfin + twfin[0]
-			th1 = tfin + twfin[1]
+			# th0 = tfin + twfin[0]
+			# th1 = tfin + twfin[1]
+			th0 = tfin + self.opts.xlimit[0]
+			th1 = tfin + self.opts.xlimit[1]
 			sacdh.sethdr(wh0, th0)
 			sacdh.sethdr(wh1, th1)
 
@@ -762,6 +804,7 @@ class mainGUI(object):
 			curve.clear()
 		# self.stackedPlot.curves[0].clear()
 		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
+		self.scalePlotYRange(self.stackedPlot)
 
 		for plt in self.plotList:
 			dataSet = getWaveDataSetFromSacItem(plt.sacdh, self.opts)
@@ -772,6 +815,7 @@ class mainGUI(object):
 				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (255, 0, 0, 75))
 			else:
 				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = (0, 255, 0, 75))
+			self.scalePlotYRange(plt)
 
 
 
