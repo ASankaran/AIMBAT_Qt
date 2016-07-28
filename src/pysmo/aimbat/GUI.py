@@ -31,7 +31,7 @@ class mainGUI(object):
 	def __init__(self, sacgroup, opts):
 		self.application = QApplication(sys.argv)
 		self.window = QWidget()
-		self.window.setWindowTitle('Seismic Plots')
+		self.window.setWindowTitle('ttpick')
 		self.window.show()
 		self.layout = QGridLayout(self.window)
 
@@ -333,7 +333,6 @@ class mainGUI(object):
 		stkdh.sethdr(hdrmed, self.tmed)
 
 	def finalizeButtonClicked(self):
-		print 'Finalize Clicked'
 		self.getWindow(self.opts.mcpara.ipick)
 		tw = self.opts.ccpara.twcorr[1] - self.opts.ccpara.twcorr[0]
 		taperwindow = taperWindow(self.opts.ccpara.twcorr, self.opts.mcpara.taperwidth)
