@@ -1,14 +1,10 @@
-from aimbat.GUI import mainGUI
-from aimbat.seismodata import DataItem, getDataSet
-
-import sys
+#!/usr/bin/env python
+from pysmo.aimbat.GUI import mainGUI
+from pysmo.aimbat.seismodata import getDataSet
 
 import pyqtgraph as pg
 
-if len(sys.argv) == 1:
-	sys.argv.append('/Users/geophysics/Documents/20110915.19310408.bhz.pkl')
 sacgroup, opts = getDataSet()
-
 
 gui = mainGUI(sacgroup, opts)
 gui.setupGUI()
