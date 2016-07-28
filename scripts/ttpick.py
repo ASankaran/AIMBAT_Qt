@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 from pysmo.aimbat_qt.GUI import mainGUI
-from pysmo.aimbat_qt.seismodata import getDataSet
+from pysmo.aimbat_qt.seismodata import getDataOpts
 
 import pyqtgraph as pg
 
-sacgroup, opts = getDataSet()
+sacgroup, opts = getDataOpts()
 
 gui = mainGUI(sacgroup, opts)
 gui.setupGUI()
