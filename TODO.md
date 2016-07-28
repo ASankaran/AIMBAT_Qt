@@ -6,7 +6,6 @@ Uncompleted
 - Change Background color (A black on white color scheme would be better)
 - Use different fill colors for when the wave is above / below the zero line
 - Incrementally load plots to decrease load time
-- Resample data at lower rate when creating SAC P2 to decrease load time
 - Use GMT for plotting stations
 - Add lines between plots
 

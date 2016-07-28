@@ -711,10 +711,10 @@ class sacp2GUI(object):
 			pltItem4.curve.opts['name'] = dataSet.name
 
 		if self.sacgroup.selist[0].gethdr(hdrfin) != -12345.0:
-			plot1.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
-			plot2.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
-			plot3.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
-			plot4.setXRange(self.opts.ccpara.twcorr[0], self.opts.ccpara.twcorr[1])
+			plot1.setXRange(self.opts.xlimit[0], self.opts.xlimit[1])
+			plot2.setXRange(self.opts.xlimit[0], self.opts.xlimit[1])
+			plot3.setXRange(self.opts.xlimit[0], self.opts.xlimit[1])
+			plot4.setXRange(self.opts.xlimit[0], self.opts.xlimit[1])
 
 		plot1.hideAxis('bottom')
 		plot1.hideAxis('left')
