@@ -47,12 +47,7 @@ class mainGUI(object):
 		self.stkdh = None
 		self.stackedPlot = None
 
-		self.selectedWindow = [0, 0]
-		self.t2pick = 0
-
 		self.plotList = []
-
-		self.selectedIndexes = []
 
 		self.gfxWidget = None
 
@@ -88,8 +83,6 @@ class mainGUI(object):
 				return
 			elif self.stkdh.gethdr(hdrfin) + 30 - 5 <= timewindow[1] <= self.stkdh.gethdr(hdrfin) + 30 + 5:
 				return
-
-		self.selectedWindow = timewindow
 
 		twh0, twh1 = self.opts.pppara.twhdrs
 		self.stkdh.sethdr(twh0, timewindow[0])
@@ -148,7 +141,6 @@ class mainGUI(object):
 			if sacitem in self.sacgroup.selist:
 				brush = utils.convertToRGBA(self.opts.pppara.colorwave, 75)
 				isSelected = True
-				self.selectedIndexes.append(index)
 
 				plt.setTitle(plt.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 			else:
@@ -232,9 +224,8 @@ class mainGUI(object):
 			self.addTimePick(plotItemClicked, xpoint, hdrfin)
 
 			if plotItemClicked is self.stackedPlot:
-				self.t2pick = xpoint
 				hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-				self.stkdh.sethdr(hdrfin, self.t2pick)
+				self.stkdh.sethdr(hdrfin, xpoint)
 			else:
 				plotItemClicked.sacdh.thdrs[2] = xpoint
 
@@ -247,7 +238,6 @@ class mainGUI(object):
 				curve.setFillBrush(utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
 				curve.selected = False
 			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
-			self.selectedIndexes.remove(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = False
 			self.sacgroup.selist.remove(plotItemClicked.sacdh)
 			self.sacgroup.delist.append(plotItemClicked.sacdh)
@@ -256,7 +246,6 @@ class mainGUI(object):
 				curve.setFillBrush(utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 				curve.selected = True
 			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
-			self.selectedIndexes.append(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = True
 			self.sacgroup.delist.remove(plotItemClicked.sacdh)
 			self.sacgroup.selist.append(plotItemClicked.sacdh)
@@ -355,16 +344,7 @@ class mainGUI(object):
 		self.opts.mcpara.mcname = mcname
 		self.opts.mcpara.kevnm = self.sacgroup.kevnm
 
-		# Move a bunch of data to the location that the mccc function expects it
-		selectedList = []
-		deselectedList = []
-		for x in xrange(0, len(self.sacgroup.saclist)):
-			if x in self.selectedIndexes:
-				selectedList.append(self.sacgroup.saclist[x])
-			else:
-				deselectedList.append(self.sacgroup.saclist[x])
-		self.sacgroup.selist = selectedList
-		self.sacgroup.delist = deselectedList
+		# move stkdh into sacgroup
 		self.sacgroup.stkdh = self.stkdh
 
 		solution, solist_LonLat, delay_times = mccc(self.sacgroup, self.opts.mcpara)
@@ -570,10 +550,7 @@ class mainGUI(object):
 
 	def ccStack(self):
 		hdr0, hdr1 = int(self.opts.ccpara.cchdrs[0][1]), int(self.opts.ccpara.cchdrs[1][1])
-		selectedList = []
-		for index in self.selectedIndexes:
-			selectedList.append(self.sacgroup.saclist[index])
-		stkdh, stkdata, quas = ccWeightStack(selectedList, self.opts)
+		stkdh, stkdata, quas = ccWeightStack(self.sacgroup.selist, self.opts)
 		stkdh.sethdr(self.opts.qcpara.hdrsel, 'True    ')
 		self.stkdh = stkdh
 		if self.opts.reltime != hdr1:
