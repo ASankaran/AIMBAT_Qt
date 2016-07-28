@@ -46,7 +46,6 @@ class mainGUI(object):
 
 		self.stkdh = None
 		self.stackedPlot = None
-		# self.originalStackedPlotRanges = {'x' : [0, 0], 'y' : [0, 0]}
 
 		self.selectedWindow = [0, 0]
 		self.t2pick = 0
@@ -70,45 +69,13 @@ class mainGUI(object):
 
 		self.gfxWidget.scene().sigMouseClicked.connect(self.mouseClickEvents)
 
-		# self.stackedPlot.enableAutoRange('x', True)
-		# self.originalStackedPlotRanges['x'] = self.stackedPlot.viewRange()[0]
-		# self.originalStackedPlotRanges['y'] = self.stackedPlot.viewRange()[1]
-		# self.stackedPlot.enableAutoRange('x', False)
-
-		# hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-		# if self.stkdh.gethdr(hdrfin) != -12345.0:
-		# 	self.stackedPlot.setXRange(self.opts.ccpara.twcorr[0] + self.stackedPlot.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + self.stackedPlot.sacdh.gethdr(hdrfin))
-		# else:
-		# 	self.stackedPlot.setXRange(self.stackedPlot.sacdh.gethdr(hdrmed) + self.opts.xlimit[0], self.stackedPlot.sacdh.gethdr(hdrmed) + self.opts.xlimit[1])
-		# self.scalePlotYRange(self.stackedPlot)
-		# print self.originalStackedPlotRanges
-
-		# hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-		# self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrini), 't0') # fix to pass hdrini var
-		# self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrmed), 't1') # fix to pass hdrini var
-		# for plt in self.plotList:
-		# 	self.addTimePick(plt, plt.sacdh.gethdr(hdrini), 't0') # fix to pass hdrini var
-		# 	self.addTimePick(plt, plt.sacdh.gethdr(hdrmed), 't1') # fix to pass hdrini var
-
 		stackedVB = self.stackedPlot.getViewBox()
 		stackedVB.setMouseMode(stackedVB.RectMode)
 		stackedVB.sigXRangeChanged.connect(self.setWindow)
 
 	def setWindow(self, arg):
 		timewindow = arg.state['viewRange'][0]
-		# self.stackedPlot.setYRange(*self.originalStackedPlotRanges['y'])
 		self.scalePlotYRange(self.stackedPlot)
-
-		# confirmDiag = QMessageBox()
-		# confirmDiag.setText("Set selected area as window?")
-		# confirmDiag.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-		# confirmDiag.setDefaultButton(QMessageBox.Save)
-		# userInput = confirmDiag.exec_()
-
-		# if userInput == QMessageBox.Save:
-		# 	print 'Set Timewindow:', timewindow
-		# elif userInput == QMessageBox.Cancel:
-		# 	pass
 
 		# Don't update window if plot is autosizing to fit all data
 		waveData = getWaveDataSetFromSacItem(self.stkdh, self.opts).x
@@ -128,8 +95,6 @@ class mainGUI(object):
 		self.stkdh.sethdr(twh0, timewindow[0])
 		self.stkdh.sethdr(twh1, timewindow[1])
 
-		# print 'Data Window:', getWaveDataSetFromSacItem(self.stkdh, self.opts).x[0], getWaveDataSetFromSacItem(self.stkdh, self.opts).x[-1]
-		# print 'Set Timewindow:', timewindow
 		out = 'File {:s}: set time window to {:s} and {:s}: {:6.1f} - {:6.1f} s'
 		print(out.format(self.stkdh.filename, twh0, twh1, timewindow[0], timewindow[1]))
 
@@ -161,7 +126,6 @@ class mainGUI(object):
 		if stkdh.gethdr(hdrfin) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
 			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
-		# print stkdh.gethdr(hdrini), stkdh.gethdr(hdrmed), stkdh.gethdr(hdrfin)
 
 		plt.setXRange(stkdh.gethdr(hdrmed) + self.opts.xlimit[0], stkdh.gethdr(hdrmed) + self.opts.xlimit[1])
 		self.scalePlotYRange(plt)
@@ -182,14 +146,12 @@ class mainGUI(object):
 			isSelected = None
 
 			if sacitem in self.sacgroup.selist:
-				# print 'In Selist'
 				brush = utils.convertToRGBA(self.opts.pppara.colorwave, 75)
 				isSelected = True
 				self.selectedIndexes.append(index)
 
 				plt.setTitle(plt.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 			else:
-				# print 'Not in Selist'
 				brush = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75)
 				isSelected = False
 
@@ -208,7 +170,6 @@ class mainGUI(object):
 			if sacitem.gethdr(hdrfin) != -12345.0:
 				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
 				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
-			# print sacitem.gethdr(hdrini), sacitem.gethdr(hdrmed), sacitem.gethdr(hdrfin)
 
 			plt.setXRange(sacitem.gethdr(hdrmed) + self.opts.xlimit[0], sacitem.gethdr(hdrmed) + self.opts.xlimit[1])
 			self.scalePlotYRange(plt)
@@ -286,8 +247,6 @@ class mainGUI(object):
 				curve.setFillBrush(utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
 				curve.selected = False
 			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwavedel, 75))
-			# plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
-			# plotItemClicked.curves[0].selected = False
 			self.selectedIndexes.remove(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = False
 			self.sacgroup.selist.remove(plotItemClicked.sacdh)
@@ -297,14 +256,10 @@ class mainGUI(object):
 				curve.setFillBrush(utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 				curve.selected = True
 			plotItemClicked.setTitle(plotItemClicked.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
-			# plotItemClicked.curves[0].setFillBrush((255, 0, 0, 75))
-			# plotItemClicked.curves[0].selected = True
 			self.selectedIndexes.append(plotItemClicked.index)
 			plotItemClicked.sacdh.selected = True
 			self.sacgroup.delist.remove(plotItemClicked.sacdh)
 			self.sacgroup.selist.append(plotItemClicked.sacdh)
-		#plotItemClicked.curves[0].setFillBrush((0, 255, 0, 75))
-		#self.gfxWidget.removeItem(plotItemClicked)
 
 	def scalePlotYRange(self, plt):
 		xRange = plt.viewRange()[0]
@@ -364,27 +319,14 @@ class mainGUI(object):
 			ipk = int(hdrfin[1])
 			# tpk = tfin - sacdh.reftime
 			tpk = tfin
-			# pp.timepicks[ipk].set_xdata(tpk)
 			self.addTimePick(plt, tpk, hdrfin)
 			th0 = tfin + twfin[0]
 			th1 = tfin + twfin[1]
-			# pp.twindow = [th0, th1]
-			#plt.setXRange(th0, th1)
 			wh0, wh1 = self.opts.qcpara.twhdrs
 			w0 = sacdh.gethdr(wh0)
 			w1 = sacdh.gethdr(wh1)
 			plt.setXRange(w0, w1)
-			# print th0, th1
-			# print w0, w1
-			# pp.resetWindow()
 		print '--> Sync final time picks and time window... You can now run CCFF to refine final picks.'
-
-		# hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-		# self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrini), 't0') # fix to pass hdrini var
-		# self.addTimePick(self.stackedPlot, self.stkdh.gethdr(hdrmed), 't1') # fix to pass hdrini var
-		# for plt in self.plotList:
-		# 	self.addTimePick(plt, plt.sacdh.gethdr(hdrini), 't0') # fix to pass hdrini var
-		# 	self.addTimePick(plt, plt.sacdh.gethdr(hdrmed), 't1') # fix to pass hdrini var
 
 	def refineButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
@@ -400,8 +342,6 @@ class mainGUI(object):
 		stkdh = self.stkdh
 		stkdh.sethdr(hdrini, self.tini)
 		stkdh.sethdr(hdrmed, self.tmed)
-		# self.replot()
-		# print self.tini, self.tmed, self.tfin
 
 	def finalizeButtonClicked(self):
 		print 'Finalize Clicked'
@@ -436,7 +376,6 @@ class mainGUI(object):
 			out = '\n--> change opts.reltime from %i to %i'
 			print out % (self.opts.reltime, wpk)
 		self.opts.reltime = wpk
-		# self.replot()
 
 	def saveButtonClicked(self):
 		# move stacked sacfile into sacgroup
@@ -551,63 +490,6 @@ class mainGUI(object):
 		self.reorderPlots()
 
 	def sacp2ButtonClicked(self):
-		# print 'SAC P2 Clicked'
-		# sacp2Window = QWidget()
-		# sacp2Window.setWindowTitle('SAC P2')
-		# sacp2Window.show()
-		# sacp2layout = QGridLayout(sacp2Window)
-
-		# sacp2gfxWidget = pg.GraphicsLayoutWidget()
-		# sacp2gfxWidget.resize(1800, 1200)
-
-
-		# plot1 = sacp2gfxWidget.addPlot(title = 'Plot T0')
-		# sacp2gfxWidget.nextRow()
-		# plot2 = sacp2gfxWidget.addPlot(title = 'Plot T1')
-		# sacp2gfxWidget.nextRow()
-		# plot3 = sacp2gfxWidget.addPlot(title = 'Plot T2')
-		# sacp2gfxWidget.nextRow()
-		# plot4 = sacp2gfxWidget.addPlot(title = 'Plot T3')
-		# sacp2gfxWidget.nextRow()
-
-		# for sacdh in self.sacgroup.selist:
-		# 	dataSet = getWaveDataSetFromSacItem(sacdh)
-
-		# 	hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
-
-		# 	shiftT0 = sacdh.gethdr(hdrini)
-		# 	shiftT1 = sacdh.gethdr(hdrmed)
-		# 	shiftT2 = sacdh.gethdr(hdrfin)
-		# 	shiftT3 = sacdh.gethdr(self.opts.mcpara.wpick)
-
-		# 	shiftedXT0 = [val - shiftT0 for val in dataSet.x]
-		# 	shiftedXT1 = [val - shiftT1 for val in dataSet.x]
-		# 	shiftedXT2 = [val - shiftT2 for val in dataSet.x]
-		# 	shiftedXT3 = [val - shiftT3 for val in dataSet.x]
-
-		# 	plot1.plot(shiftedXT0, dataSet.y)
-		# 	plot2.plot(shiftedXT1, dataSet.y)
-		# 	plot3.plot(shiftedXT2, dataSet.y)
-		# 	plot4.plot(shiftedXT3, dataSet.y)
-
-		# plot1.hideAxis('bottom')
-		# plot1.hideAxis('left')
-		# plot2.hideAxis('bottom')
-		# plot2.hideAxis('left')
-		# plot3.hideAxis('bottom')
-		# plot3.hideAxis('left')
-		# plot4.hideAxis('bottom')
-		# plot4.hideAxis('left')
-
-
-		# sacp2layout.addWidget(sacp2gfxWidget, 0, 0, 1, 1)
-		# sacp2Window.resize(1800, 1200)
-
-		# # write to class varable so garage collector doesn't delete window
-		# self.sacp2Window = sacp2Window
-
-		# self.sacp2Window.show()
-
 		self.sacp2Window = sacp2GUI(self.sacgroup, self.opts)
 		self.sacp2Window.start()
 
@@ -622,7 +504,6 @@ class mainGUI(object):
 
 		index = 1
 		for sacdh in self.sacgroup.saclist:
-			# print '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + ']'
 			stationEntries += '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + '],\n'
 			index += 1
 		stationEntries = stationEntries[:-2]
@@ -654,7 +535,6 @@ class mainGUI(object):
 			plot.t2Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[2]), 'width' : 2})
 		else:
 			plot.addLine(x = xVal, pen = {'color' : (255, 255, 255), width : 2})
-		# plot.addLine(x = xVal)
 
 	def getWindow(self, hdr):
 		twh0, twh1 = self.opts.pppara.twhdrs
@@ -687,8 +567,6 @@ class mainGUI(object):
 				self.stkdh.reftime = reftime
 		else:
 			self.stkdh.reftime = 0.
-
-		print self.stkdh.reftime
 
 	def ccStack(self):
 		hdr0, hdr1 = int(self.opts.ccpara.cchdrs[0][1]), int(self.opts.ccpara.cchdrs[1][1])
@@ -754,15 +632,6 @@ class mainGUI(object):
 		else:
 			self.sacgroup.selist, self.sacgroup.delist = sortSeisHeader(self.sacgroup.saclist, self.opts.sortby, sortincrease)
 
-		# print 'Selected Seismograms'
-		# for sacdh in self.sacgroup.selist:
-		# 	data = getWaveDataSetFromSacItem(sacdh)
-		# 	print data.name
-		# print 'Deselected Seismograms'
-		# for sacdh in self.sacgroup.delist:
-		# 	data = getWaveDataSetFromSacItem(sacdh)
-		# 	print data.name
-
 	def reorderPlots(self):
 
 		def swap(itemList, index1, index2):
@@ -797,22 +666,10 @@ class mainGUI(object):
 			self.gfxWidget.addItem(plot)
 			self.gfxWidget.nextRow()
 
-		# self.printQuals()
-
-	# def printQuals(self):
-	# 	for plot in self.plotList:
-	# 		hdrcc, hdrsn, hdrco = self.opts.qheaders[:3]
-	# 		cc = plot.sacdh.gethdr(hdrcc)
-	# 		sn = plot.sacdh.gethdr(hdrsn)
-	# 		co = plot.sacdh.gethdr(hdrco)
-	# 		print 'qual={0:4.2f}/{1:.1f}/{2:4.2f}'.format(cc, sn, co)
-
 	def redrawPlots(self, event):
-		# print 'Redraw Plots', self.opts.filterParameters['apply']
 		dataSet = getWaveDataSetFromSacItem(self.stackedPlot.sacdh, self.opts)
 		for curve in self.stackedPlot.curves:
 			curve.clear()
-		# self.stackedPlot.curves[0].clear()
 		self.stackedPlot.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 		self.scalePlotYRange(self.stackedPlot)
 
@@ -820,7 +677,6 @@ class mainGUI(object):
 			dataSet = getWaveDataSetFromSacItem(plt.sacdh, self.opts)
 			for curve in plt.curves:
 				curve.clear()
-			# plt.curves[0].clear()
 			if plt.sacdh.selected:
 				plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 			else:
@@ -867,21 +723,6 @@ class sacp2GUI(object):
 			shiftedXT1 = [val - shiftT1 for val in dataSet.x]
 			shiftedXT2 = [val - shiftT2 for val in dataSet.x]
 			shiftedXT3 = [val - shiftT3 for val in dataSet.x]
-
-			# Only plot datapoints that will be in range of window. Doesn't look like it makes a meaningful speed difference
-			# if sacdh.gethdr(hdrfin) != -12345.0:
-			# 	startIndexes = [0, 0, 0, 0]
-			# 	endIndexes = [len(shiftedXT0) - 1, len(shiftedXT1) - 1, len(shiftedXT2) - 1, len(shiftedXT3) - 1]
-			# 	for index, xValsList in enumerate([shiftedXT0, shiftedXT1, shiftedXT2, shiftedXT3]):
-			# 		while xValsList[startIndexes[index]] < self.opts.ccpara.twcorr[0]:
-			# 			startIndexes[index] += 1
-			# 		while xValsList[endIndexes[index]] > self.opts.ccpara.twcorr[1]:
-			# 			endIndexes[index] -= 1
-
-			# pltItem1 = plot1.plot(shiftedXT0[startIndexes[0] : endIndexes[0]], dataSet.y[startIndexes[0] : endIndexes[0]])
-			# pltItem2 = plot2.plot(shiftedXT1[startIndexes[1] : endIndexes[1]], dataSet.y[startIndexes[1] : endIndexes[1]])
-			# pltItem3 = plot3.plot(shiftedXT2[startIndexes[2] : endIndexes[2]], dataSet.y[startIndexes[2] : endIndexes[2]])
-			# pltItem4 = plot4.plot(shiftedXT3[startIndexes[3] : endIndexes[3]], dataSet.y[startIndexes[3] : endIndexes[3]])
 
 			pltItem1 = plot1.plot(shiftedXT0, dataSet.y)
 			pltItem2 = plot2.plot(shiftedXT1, dataSet.y)
@@ -1072,13 +913,11 @@ class filterGUI(object):
 
 
 	def orderChanged(self, event):
-		# print 'Order Changed', event.text()
 		self.opts.filterParameters['order'] = int(event.text())
 		self.updateLabels()
 		self.runFilter()
 
 	def filterTypeChanged(self, event):
-		# print 'Filter Type Changed', event.text()
 		self.opts.filterParameters['band'] = event.text()
 		if event.text() == 'bandpass':
 			self.opts.filterParameters['lowFreq'] = 0.05
@@ -1096,7 +935,6 @@ class filterGUI(object):
 		self.runFilter()
 
 	def runReverseChanged(self, event):
-		# print 'Run Reverse Changed', event.text()
 		if event.text() == 'yes':
 			self.opts.filterParameters['reversepass'] = True
 		elif event.text() == 'no':
@@ -1104,11 +942,9 @@ class filterGUI(object):
 		self.runFilter()
 
 	def applyClicked(self, event):
-		# print 'Apply Clicked', event
 		self.opts.filterParameters['apply'] = True
 
 	def unapplyClicked(self, event):
-		# print 'Unapply Clicked', event
 		self.opts.filterParameters['apply'] = False
 
 	def updateLabels(self):
@@ -1136,11 +972,6 @@ class filterGUI(object):
 
 		# self.signaltimePlot.setXRange(-30.0, 30.0)
 		self.freqampPlot.setXRange(0, 1.50, padding = 0)
-
-		# signaltimeLegend = self.signaltimePlot.addLegend()
-		# freqampLegend = self.freqampPlot.addLegend()
-		# signaltimeLegend.anchor(itemPos = (1, 0), parentPos = (1, 0), offset = (-30, 30))
-		# freqampLegend.anchor(itemPos = (1, 0), parentPos = (1, 0), offset = (-30, 30))
 
 		self.signaltimePlot.plot(originalTime, originalSignalTime, pen = (0, 0, 255), name = 'Original')
 		self.signaltimePlot.plot(originalTime, filteredSignalTime, pen = (0, 255, 0), name = 'Filtered')
