@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from pysmo.aimbat.GUI import mainGUI
-from pysmo.aimbat.seismodata import getDataSet
+from pysmo.aimbat_qt.GUI import mainGUI
+from pysmo.aimbat_qt.seismodata import getDataSet
 
 import pyqtgraph as pg
 

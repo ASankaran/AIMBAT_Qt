@@ -20,17 +20,17 @@ from numpy.distutils.core import setup, Extension
 doclines = __doc__.split("\n")
 version = open('Version.txt').read().split()[0]
 
-setup(name='pysmo.aimbat',
+setup(name='pysmo.aimbat_qt',
 	version=version,
 	description=doclines[0],
 	author='Xiaoting Lou',
 	author_email='xlou@u.northwestern.edu',
-	package_dir={'pysmo.aimbat': 'src/pysmo/aimbat', 'pysmo':'src/pysmo'},
-	packages=['pysmo.aimbat', 'pysmo'],
+	package_dir={'pysmo.aimbat_qt': 'src/pysmo/aimbat', 'pysmo':'src/pysmo'},
+	packages=['pysmo.aimbat_qt', 'pysmo'],
 	url='http://www.earth.northwestern.edu/~xlou/aimbat.html',
-	ext_package='pysmo.aimbat',
+	ext_package='pysmo.aimbat_qt',
 	ext_modules=[Extension('xcorrf90', ['src/pysmo/aimbat/xcorr.f90'])],
-	package_data={'pysmo.aimbat': ['ttdefaults.conf', 'Readme.txt', 'Version.txt', 'License.txt', 'Changelog.txt']},
+	package_data={'pysmo.aimbat_qt': ['ttdefaults.conf', 'Readme.txt', 'Version.txt', 'License.txt', 'Changelog.txt']},
 	long_description="\n".join(doclines[2:]),
 	license='GNU General Public License, Version 3 (GPLv3)',
 	platforms=['Mac OS X', 'Linux/Unix', 'Windows']
