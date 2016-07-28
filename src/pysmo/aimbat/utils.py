@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+#------------------------------------------------
+# Filename: utils.py
+#   Author: Arnav Sankaran
+#    Email: arnavsankaran@gmail.com
+#
+# Copyright (c) 2016 Arnav Sankaran
+#------------------------------------------------
 def convertToRGBA(color, alpha):
 	colors = {
 		'b': (0, 0, 255, alpha),

@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+#------------------------------------------------
+# Filename: GUI.py
+#   Author: Arnav Sankaran
+#    Email: arnavsankaran@gmail.com
+#
+# Copyright (c) 2016 Arnav Sankaran
+#------------------------------------------------
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 

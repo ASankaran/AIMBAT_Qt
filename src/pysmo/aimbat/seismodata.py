@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+#------------------------------------------------
+# Filename: seismodata.py
+#   Author: Arnav Sankaran
+#    Email: arnavsankaran@gmail.com
+#
+# Copyright (c) 2016 Arnav Sankaran
+#------------------------------------------------
 from sacpickle import readPickle
 from pysmo.sac.sacio import sacfile
 from numpy import linspace, array
