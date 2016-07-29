@@ -16,7 +16,7 @@ import os
 import webbrowser
 
 from seismodata import getWaveDataSetFromSacItem
-from algiccs import ccWeightStack
+from algiccs import ccWeightStack, checkCoverage
 from algmccc import eventListName, mccc
 from sacpickle import taperWindow, saveData
 from qualsort import seleSeis, sortSeisQual, sortSeisHeader, sortSeisHeaderDiff
@@ -233,6 +233,7 @@ class mainGUI(object):
 				self.stkdh.sethdr(hdrfin, xpoint)
 			else:
 				plotItemClicked.sacdh.thdrs[2] = xpoint
+				plotItemClicked.sacdh.sethdr(hdrfin, xpoint)
 
 		# If single click select / deselect a plot
 		if plotItemClicked is self.stackedPlot:
