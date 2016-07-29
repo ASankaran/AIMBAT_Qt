@@ -124,6 +124,8 @@ class mainGUI(object):
 		if stkdh.gethdr(hdrfin) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
 			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
+		if self.opts.reltime == 3:
+			self.addTimePick(plt, stkdh.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
 
 		plt.setXRange(stkdh.gethdr(hdrmed) + self.opts.xlimit[0], stkdh.gethdr(hdrmed) + self.opts.xlimit[1])
 		self.scalePlotYRange(plt)
@@ -167,6 +169,8 @@ class mainGUI(object):
 			if sacitem.gethdr(hdrfin) != -12345.0:
 				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
 				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
+			if self.opts.reltime == 3:
+				self.addTimePick(plt, sacitem.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
 
 			plt.setXRange(sacitem.gethdr(hdrmed) + self.opts.xlimit[0], sacitem.gethdr(hdrmed) + self.opts.xlimit[1])
 			self.scalePlotYRange(plt)
@@ -357,6 +361,10 @@ class mainGUI(object):
 		self.sacgroup.solist_LonLat = solist_LonLat
 		self.sacgroup.delay_times = delay_times
 
+		self.addTimePick(self.stackedPlot, self.stkdh.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
+		for plt in self.plotList:
+			self.addTimePick(plt, plt.sacdh.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
+
 		wpk = int(self.opts.mcpara.wpick[1])
 		if self.opts.reltime != wpk:
 			out = '\n--> change opts.reltime from %i to %i'
@@ -506,6 +514,7 @@ class mainGUI(object):
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		wpick = self.opts.mcpara.wpick
 
 		if pick == hdrini:
 			if hasattr(plot, 't0Line'):
@@ -519,6 +528,10 @@ class mainGUI(object):
 			if hasattr(plot, 't2Line'):
 				plot.removeItem(plot.t2Line)
 			plot.t2Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[2]), 'width' : 2})
+		elif pick == wpick:
+			if hasattr(plot, 't3Line'):
+				plot.removeItem(plot.t3Line)
+			plot.t3Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[3]), 'width' : 2})
 		else:
 			plot.addLine(x = xVal, pen = {'color' : (255, 255, 255), width : 2})
 
