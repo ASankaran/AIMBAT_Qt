@@ -64,6 +64,7 @@ class mainGUI(object):
 
 		self.gfxWidget.scene().sigMouseClicked.connect(self.mouseClickEvents)
 
+		# Set mouse mode so user can drag a box on the stacked plot to select cross correlation window
 		stackedVB = self.stackedPlot.getViewBox()
 		stackedVB.setMouseMode(stackedVB.RectMode)
 		stackedVB.sigXRangeChanged.connect(self.setWindow)
@@ -102,6 +103,10 @@ class mainGUI(object):
 			stkdh = self.sacgroup.stkdh
 		else:
 			self.opts.ccpara.cchdrs = [hdrini, hdrmed]
+			self.twcorr = self.opts.ccpara.twcorr
+			self.opts.ipick = hdrini
+			self.opts.twcorr = self.opts.ccpara.twcorr
+			checkCoverage(self.sacgroup, self.opts)
 			stkdh, stkdata, quas = ccWeightStack(self.sacgroup.saclist, self.opts)
 		
 		self.stkdh = stkdh
@@ -216,7 +221,7 @@ class mainGUI(object):
 			if isinstance(item, pg.graphicsItems.PlotItem.PlotItem):
 				plotItemClicked = item
 
-		#If double click add t2 time
+		# If double click add t2 time
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 		if event.double():
 			plotVB = plotItemClicked.getViewBox()
@@ -229,7 +234,7 @@ class mainGUI(object):
 			else:
 				plotItemClicked.sacdh.thdrs[2] = xpoint
 
-		#If single click select / deselect a plot
+		# If single click select / deselect a plot
 		if plotItemClicked is self.stackedPlot:
 			return
 
@@ -251,6 +256,7 @@ class mainGUI(object):
 			self.sacgroup.selist.append(plotItemClicked.sacdh)
 
 	def scalePlotYRange(self, plt):
+		# Set plot y range to min and max y values on the visual x range
 		xRange = plt.viewRange()[0]
 		dataSet = getWaveDataSetFromSacItem(plt.sacdh, self.opts)
 		startXIndex = 0
@@ -609,6 +615,7 @@ class mainGUI(object):
 			self.sacgroup.selist, self.sacgroup.delist = sortSeisHeader(self.sacgroup.saclist, self.opts.sortby, sortincrease)
 
 	def reorderPlots(self):
+		# Basically runs a selection sort on the plots where you compare the plot's sacobj to the sort list of sacobjs
 
 		def swap(itemList, index1, index2):
 			tmp = itemList[index1]
