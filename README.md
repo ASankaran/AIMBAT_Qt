@@ -19,7 +19,9 @@ For more informaton visit the [project website](http://www.earth.northwestern.ed
 
 Documentation
 -------------
-Read about the features and their usage in the latest version of AIMBAT on github [here](http://aimbat.readthedocs.org/en/latest/index.html).
+Read about the features and their usage in the latest version of AIMBAT-Qt on github [here](https://github.com/ASankaran/AIMBAT_Qt/wiki).
+
+Additionally you will find valuable information in the documentation written for the original version of AIMBAT [here](http://aimbat.readthedocs.org/en/latest/index.html).
 
 Dependencies
 ------------
@@ -38,7 +40,4 @@ Each time you make changes to any of the files in this repository, run
 	sudo python setup.py build --fcompiler=gfortran
 	sudo python setup.py install
 	
-To build again to allow the changes to take place.
-
-
-
+To build again and allow the changes to take place.
