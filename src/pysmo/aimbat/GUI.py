@@ -558,23 +558,21 @@ class mainGUI(object):
 		self.filterWindow.unapplyButton.clicked.connect(self.redrawPlots)
 
 	def mapstationsButtonClicked(self):
-		stationEntries = ''
+		selectedLatLon = ''
+		for sacdh in self.sacgroup.selist:
+			selectedLatLon += str(sacdh.stla) + ' ' + str(sacdh.stlo) + '\n'
+		deselectedLatLon = ''
+		for sacdh in self.sacgroup.delist:
+			deselectedLatLon += str(sacdh.stla) + ' ' + str(sacdh.stlo) + '\n'
+		with open(os.path.join(os.getcwd(), 'selectedstations.gmt'), 'w+') as tmpfile:
+			tmpfile.write(selectedLatLon)
+		with open(os.path.join(os.getcwd(), 'deselectedstations.gmt'), 'w+') as tmpfile:
+			tmpfile.write(deselectedLatLon)
 
-		index = 1
-		for sacdh in self.sacgroup.saclist:
-			stationEntries += '[\'' + str(sacdh.netsta) + '\',' + str(sacdh.stla) + ',' + str(sacdh.stlo) + ',' + str(index) + '],\n'
-			index += 1
-		stationEntries = stationEntries[:-2]
-
+		import subprocess
 		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-		with open(os.path.join(__location__, 'gmapstemplate.html'), 'r') as templateFile:
-			htmlMap = templateFile.read()
-		htmlMap = htmlMap % (stationEntries)
-		with open(os.path.join(os.path.expanduser('~'), 'tmpfile.html'), 'w+') as tmpfile:
-			tmpfile.write(htmlMap)
-
-		webbrowser.open('file://' + os.path.join(os.path.expanduser('~'), 'tmpfile.html'), new = 1)
+		print os.path.join(__location__, 'stationplottingtemplate.map')
+		subprocess.call(['/bin/bash', os.path.join(__location__, 'stationplottingtemplate.map')])
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
