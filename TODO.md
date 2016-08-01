@@ -11,7 +11,6 @@ Uncompleted
 - Override autoscale button to not zoom out to full plot
 - Line up by T2 when refine clicked
 - Line up by T3 when finalize clicked
-- Resize window based on display resolution
 
 Completed
 ---------
@@ -27,3 +26,4 @@ Completed
 - Update Setup.py, to not conflict with the original AIMBAT
 - Keep array stack at the top
 - Add quality labels to plot title
+- Resize window based on display resolution

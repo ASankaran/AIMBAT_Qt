@@ -52,12 +52,15 @@ class mainGUI(object):
 		self.gfxWidget = None
 
 	def setupGUI(self):
-		self.gfxStackedWidget = self.getStackedGraphicsLayoutWindow(1800, 100)
+		resolutionRect = self.application.desktop().availableGeometry()
+		self.window.resize(resolutionRect.width(), resolutionRect.height())
+
+		self.gfxStackedWidget = self.getStackedGraphicsLayoutWindow(resolutionRect.width() * 0.97, 100)
 		stackedScrollArea = QScrollArea()
 		stackedScrollArea.setWidget(self.gfxStackedWidget)
 		self.addWidget(stackedScrollArea, 1, 0, xSpan = 2, ySpan = 10)
 
-		self.gfxWidget = self.getPlotGraphicsLayoutWindow(1800, 100 * len(self.sacgroup.saclist))
+		self.gfxWidget = self.getPlotGraphicsLayoutWindow(resolutionRect.width() * 0.97, 100 * len(self.sacgroup.saclist))
 		scrollArea = QScrollArea()
 		scrollArea.setWidget(self.gfxWidget)
 		self.addWidget(scrollArea, 3, 0, xSpan = 16, ySpan = 10)
@@ -196,7 +199,6 @@ class mainGUI(object):
 			gfxWidget.nextRow()
 			index += 1
 			self.plotList.append(plt)
-		self.window.resize(xSize + 55, ySize)
 
 		return gfxWidget
 
@@ -508,11 +510,13 @@ class mainGUI(object):
 		self.reorderPlots()
 
 	def sacp2ButtonClicked(self):
-		self.sacp2Window = sacp2GUI(self.sacgroup, self.opts)
+		resolutionRect = self.application.desktop().availableGeometry()
+		self.sacp2Window = sacp2GUI(self.sacgroup, self.opts, resolutionRect)
 		self.sacp2Window.start()
 
 	def filterButtonClicked(self):
-		self.filterWindow = filterGUI(self.sacgroup, self.stkdh, self.opts)
+		resolutionRect = self.application.desktop().availableGeometry()
+		self.filterWindow = filterGUI(self.sacgroup, self.stkdh, self.opts, resolutionRect)
 		self.filterWindow.start()
 		self.filterWindow.applyButton.clicked.connect(self.redrawPlots)
 		self.filterWindow.unapplyButton.clicked.connect(self.redrawPlots)
@@ -707,9 +711,11 @@ class mainGUI(object):
 
 
 class sacp2GUI(object):
-	def __init__(self, sacgroup, opts):
+	def __init__(self, sacgroup, opts, resolutionRect):
 		self.sacgroup = sacgroup
 		self.opts = opts
+
+		self.resolutionRect = resolutionRect
 
 	def start(self):
 		sacp2Window = QWidget()
@@ -718,7 +724,7 @@ class sacp2GUI(object):
 		sacp2layout = QGridLayout(sacp2Window)
 
 		sacp2gfxWidget = pg.GraphicsLayoutWidget()
-		sacp2gfxWidget.resize(1800, 1200)
+		sacp2gfxWidget.resize(self.resolutionRect.width(), self.resolutionRect.height())
 
 
 		plot1 = sacp2gfxWidget.addPlot(title = 'Plot T0')
@@ -772,7 +778,7 @@ class sacp2GUI(object):
 
 
 		sacp2layout.addWidget(sacp2gfxWidget, 0, 0, 1, 1)
-		sacp2Window.resize(1800, 1200)
+		sacp2Window.resize(self.resolutionRect.width(), self.resolutionRect.height())
 
 		# write to class varable so garage collector doesn't delete window
 		self.sacp2Window = sacp2Window
@@ -789,10 +795,12 @@ class sacp2GUI(object):
 
 
 class filterGUI(object):
-	def __init__(self, sacgroup, stkdh, opts):
+	def __init__(self, sacgroup, stkdh, opts, resolutionRect):
 		self.sacgroup = sacgroup
 		self.opts = opts
 		self.stkdh = stkdh
+
+		self.resolutionRect = resolutionRect
 
 		self.filterWindow = QWidget()
 		self.filterWindow.setWindowTitle('Filtering')
@@ -884,7 +892,7 @@ class filterGUI(object):
 		self.addWidget(settingsWidget, 0, 4)
 
 		self.filtergfxWidget = pg.GraphicsLayoutWidget()
-		self.filtergfxWidget.resize(1800, 1200)
+		self.filtergfxWidget.resize(self.resolutionRect.width(), self.resolutionRect.height())
 
 		self.signaltimePlot = self.filtergfxWidget.addPlot(title = 'Signal vs. Time')
 		self.filtergfxWidget.nextRow()
@@ -892,7 +900,7 @@ class filterGUI(object):
 
 		self.addWidget(self.filtergfxWidget, 6, 0, 15, 5)
 
-		self.filterWindow.resize(1800, 1200)
+		self.filterWindow.resize(self.resolutionRect.width(), self.resolutionRect.height())
 
 		# Write buttongroups to class variable so they don't get garbage collected and kill the signal
 		self.orderButtonGroup = orderButtonGroup
