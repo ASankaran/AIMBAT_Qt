@@ -52,17 +52,23 @@ class mainGUI(object):
 		self.gfxWidget = None
 
 	def setupGUI(self):
+		self.gfxStackedWidget = self.getStackedGraphicsLayoutWindow(1800, 100)
+		stackedScrollArea = QScrollArea()
+		stackedScrollArea.setWidget(self.gfxStackedWidget)
+		self.addWidget(stackedScrollArea, 1, 0, xSpan = 2, ySpan = 10)
+
 		self.gfxWidget = self.getPlotGraphicsLayoutWindow(1800, 100 * len(self.sacgroup.saclist))
 		scrollArea = QScrollArea()
 		scrollArea.setWidget(self.gfxWidget)
-		self.addWidget(scrollArea, 1, 0, xSpan = 1, ySpan = 10)
+		self.addWidget(scrollArea, 3, 0, xSpan = 16, ySpan = 10)
 		self.putButtons()
 
 		self.opts.sortby = 'all'
 		self.sortSeis()
 		self.reorderPlots()
 
-		self.gfxWidget.scene().sigMouseClicked.connect(self.mouseClickEvents)
+		self.gfxWidget.scene().sigMouseClicked.connect(self.plotMouseClickEvents)
+		self.gfxStackedWidget.scene().sigMouseClicked.connect(self.stackedMouseClickEvents)
 
 		# Set mouse mode so user can drag a box on the stacked plot to select cross correlation window
 		stackedVB = self.stackedPlot.getViewBox()
@@ -92,10 +98,10 @@ class mainGUI(object):
 		out = 'File {:s}: set time window to {:s} and {:s}: {:6.1f} - {:6.1f} s'
 		print(out.format(self.stkdh.filename, twh0, twh1, timewindow[0], timewindow[1]))
 
-	def getPlotGraphicsLayoutWindow(self, xSize, ySize):
-		gfxWidget = pg.GraphicsLayoutWidget()
-		gfxWidget.resize(xSize, ySize)
-		gfxWidget.ci.setSpacing(0)
+	def getStackedGraphicsLayoutWindow(self, xSize, ySize):
+		gfxStackedWidget = pg.GraphicsLayoutWidget()
+		gfxStackedWidget.resize(xSize, ySize)
+		gfxStackedWidget.ci.setSpacing(0)
 
 		# Create stacked plot
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
@@ -108,10 +114,10 @@ class mainGUI(object):
 			self.opts.twcorr = self.opts.ccpara.twcorr
 			checkCoverage(self.sacgroup, self.opts)
 			stkdh, stkdata, quas = ccWeightStack(self.sacgroup.saclist, self.opts)
-		
+
 		self.stkdh = stkdh
 		dataSet = getWaveDataSetFromSacItem(stkdh, self.opts)
-		plt = gfxWidget.addPlot(title = dataSet.name)
+		plt = gfxStackedWidget.addPlot(title = dataSet.name)
 		plt.plot(dataSet.x, dataSet.y, fillLevel = 0, fillBrush = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
 		plt.curves[0].selected = True
 		plt.hideAxis('bottom')
@@ -134,9 +140,16 @@ class mainGUI(object):
 
 		self.stackedPlot = plt
 
-		gfxWidget.nextRow()
+		return gfxStackedWidget
 
-		# Create plots for other seismograms
+	def getPlotGraphicsLayoutWindow(self, xSize, ySize):
+		gfxWidget = pg.GraphicsLayoutWidget()
+		gfxWidget.resize(xSize, ySize)
+		gfxWidget.ci.setSpacing(0)
+
+		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+
+		# Create plots for seismograms
 		index = 0
 		for sacitem in self.sacgroup.saclist:
 			dataSet = getWaveDataSetFromSacItem(sacitem, self.opts)
@@ -219,9 +232,15 @@ class mainGUI(object):
 		self.addWidget(filterbtn, 0, 0)
 		self.addWidget(mapstationsbtn, 0, 7)
 
-	def mouseClickEvents(self, event):
+	def plotMouseClickEvents(self, event):
+		self.mouseClickEvents(event, self.gfxWidget)
+
+	def stackedMouseClickEvents(self, event):
+		self.mouseClickEvents(event, self.gfxStackedWidget)
+
+	def mouseClickEvents(self, event, clickedWidget):
 		plotItemClicked = None
-		for item in self.gfxWidget.scene().items(event.scenePos()):
+		for item in clickedWidget.scene().items(event.scenePos()):
 			if isinstance(item, pg.graphicsItems.PlotItem.PlotItem):
 				plotItemClicked = item
 

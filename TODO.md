@@ -9,7 +9,6 @@ Uncompleted
 - Use GMT for plotting stations
 - Add lines between plots
 - Override autoscale button to not zoom out to full plot
-- Keep array stack at the top
 - Add quality labels to plot title
 - Line up by T2 when refine clicked
 - Line up by T3 when finalize clicked
@@ -27,3 +26,4 @@ Completed
 - Decrease padding between plots
 - Reorder buttons to a more natural order
 - Update Setup.py, to not conflict with the original AIMBAT
+- Keep array stack at the top
