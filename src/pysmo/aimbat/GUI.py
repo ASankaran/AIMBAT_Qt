@@ -148,12 +148,17 @@ class mainGUI(object):
 		gfxWidget.ci.setSpacing(0)
 
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		hdrcc, hdrsn, hdrco = self.opts.qheaders[:3]
 
 		# Create plots for seismograms
 		index = 0
 		for sacitem in self.sacgroup.saclist:
 			dataSet = getWaveDataSetFromSacItem(sacitem, self.opts)
-			plt = gfxWidget.addPlot(title = dataSet.name)
+			cc = sacitem.gethdr(hdrcc)
+			sn = sacitem.gethdr(hdrsn)
+			co = sacitem.gethdr(hdrco)
+			qualTitle = 'CCC={0:4.2f} SNR={1:.1f} COH={2:4.2f}'.format(cc, sn, co)
+			plt = gfxWidget.addPlot(title = dataSet.name + ',  ' + qualTitle)
 
 			brush = None
 			isSelected = None
