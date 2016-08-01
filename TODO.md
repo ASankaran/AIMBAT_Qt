@@ -8,7 +8,6 @@ Uncompleted
 - Incrementally load plots to decrease load time
 - Use GMT for plotting stations
 - Add lines between plots
-- Override autoscale button to not zoom out to full plot
 
 Completed
 ---------
@@ -27,3 +26,4 @@ Completed
 - Resize window based on display resolution
 - Line up by T2 when refine clicked
 - Line up by T3 when finalize clicked
+- Override autoscale button to not zoom out to full plot

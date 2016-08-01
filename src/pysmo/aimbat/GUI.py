@@ -143,6 +143,8 @@ class mainGUI(object):
 
 		self.stackedPlot = plt
 
+		self.overrideAutoScaleButton(self.stackedPlot)
+
 		return gfxStackedWidget
 
 	def getPlotGraphicsLayoutWindow(self, xSize, ySize):
@@ -195,6 +197,8 @@ class mainGUI(object):
 
 			plt.setXRange(sacitem.gethdr(hdrmed) + self.opts.xlimit[0], sacitem.gethdr(hdrmed) + self.opts.xlimit[1])
 			self.scalePlotYRange(plt)
+
+			self.overrideAutoScaleButton(plt)
 
 			gfxWidget.nextRow()
 			index += 1
@@ -308,13 +312,21 @@ class mainGUI(object):
 		wpick = self.opts.mcpara.wpick
 
 		if self.opts.reltime == 0:
-			plt.setXRange(plt.sacdh.gethdr(hdrini) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrini) + self.opts.xlimit[1])
+			plt.setXRange(plt.sacdh.gethdr(hdrmed) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrmed) + self.opts.xlimit[1])
 		elif self.opts.reltime == 1:
 			plt.setXRange(plt.sacdh.gethdr(hdrmed) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrmed) + self.opts.xlimit[1])
 		elif self.opts.reltime == 2:
 			plt.setXRange(plt.sacdh.gethdr(hdrfin) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrfin) + self.opts.xlimit[1])
 		elif self.opts.reltime == 3:
 			plt.setXRange(plt.sacdh.gethdr(wpick) + self.opts.xlimit[0], plt.sacdh.gethdr(wpick) + self.opts.xlimit[1])
+
+	def overrideAutoScaleButton(self, plot):
+		plot.autoBtn.clicked.disconnect()
+		plot.autoBtn.clicked.connect(lambda: self.autoScalePlot(plot))
+
+	def autoScalePlot(self, plot):
+		self.scalePlotXRange(plot)
+		self.scalePlotYRange(plot)
 
 	def alignButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
