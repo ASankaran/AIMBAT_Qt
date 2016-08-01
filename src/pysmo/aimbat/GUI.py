@@ -303,6 +303,19 @@ class mainGUI(object):
 		yData = dataSet.y[startXIndex : endXIndex]
 		plt.setYRange(min(yData), max(yData))
 
+	def scalePlotXRange(self, plt):
+		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		wpick = self.opts.mcpara.wpick
+
+		if self.opts.reltime == 0:
+			plt.setXRange(plt.sacdh.gethdr(hdrini) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrini) + self.opts.xlimit[1])
+		elif self.opts.reltime == 1:
+			plt.setXRange(plt.sacdh.gethdr(hdrmed) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrmed) + self.opts.xlimit[1])
+		elif self.opts.reltime == 2:
+			plt.setXRange(plt.sacdh.gethdr(hdrfin) + self.opts.xlimit[0], plt.sacdh.gethdr(hdrfin) + self.opts.xlimit[1])
+		elif self.opts.reltime == 3:
+			plt.setXRange(plt.sacdh.gethdr(wpick) + self.opts.xlimit[0], plt.sacdh.gethdr(wpick) + self.opts.xlimit[1])
+
 	def alignButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 		self.opts.ccpara.cchdrs = hdrini, hdrmed
@@ -326,6 +339,13 @@ class mainGUI(object):
 			self.addTimePick(plt, plt.sacdh.gethdr(hdrini), hdrini)
 			self.addTimePick(plt, plt.sacdh.gethdr(hdrmed), hdrmed)
 
+		self.stackedPlot.sacdh = self.stkdh
+		self.redrawTimePicks(self.stackedPlot)
+		self.scalePlotXRange(self.stackedPlot)
+		for plt in self.plotList:
+			self.redrawTimePicks(plt)
+			self.scalePlotXRange(plt)
+
 	def syncButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 		wh0, wh1 = self.opts.qcpara.twhdrs
@@ -336,22 +356,12 @@ class mainGUI(object):
 		self.syncPick()
 		self.syncWindow()
 
-		self.stackedPlot.setXRange(self.stkdh.gethdr(hdrfin) + self.opts.xlimit[0], self.stkdh.gethdr(hdrfin) + self.opts.xlimit[1])
-
-		twfin = self.opts.ccpara.twcorr
 		for plt in self.plotList:
 			sacdh = plt.sacdh
 			tfin = sacdh.gethdr(hdrfin)
-			ipk = int(hdrfin[1])
 			# tpk = tfin - sacdh.reftime
 			tpk = tfin
 			self.addTimePick(plt, tpk, hdrfin)
-			th0 = tfin + twfin[0]
-			th1 = tfin + twfin[1]
-			wh0, wh1 = self.opts.qcpara.twhdrs
-			w0 = sacdh.gethdr(wh0)
-			w1 = sacdh.gethdr(wh1)
-			plt.setXRange(w0, w1)
 		print '--> Sync final time picks and time window... You can now run CCFF to refine final picks.'
 
 	def refineButtonClicked(self):
@@ -368,6 +378,13 @@ class mainGUI(object):
 		stkdh = self.stkdh
 		stkdh.sethdr(hdrini, self.tini)
 		stkdh.sethdr(hdrmed, self.tmed)
+
+		self.stackedPlot.sacdh = self.stkdh
+		self.redrawTimePicks(self.stackedPlot)
+		self.scalePlotXRange(self.stackedPlot)
+		for plt in self.plotList:
+			self.redrawTimePicks(plt)
+			self.scalePlotXRange(plt)
 
 	def finalizeButtonClicked(self):
 		self.getWindow(self.opts.mcpara.ipick)
@@ -396,6 +413,13 @@ class mainGUI(object):
 			out = '\n--> change opts.reltime from %i to %i'
 			print out % (self.opts.reltime, wpk)
 		self.opts.reltime = wpk
+
+		self.stackedPlot.sacdh = self.stkdh
+		self.redrawTimePicks(self.stackedPlot)
+		self.scalePlotXRange(self.stackedPlot)
+		for plt in self.plotList:
+			self.redrawTimePicks(plt)
+			self.scalePlotXRange(plt)
 
 	def saveButtonClicked(self):
 		# move stacked sacfile into sacgroup
@@ -562,6 +586,19 @@ class mainGUI(object):
 			plot.t3Line = plot.addLine(x = xVal, pen = {'color' : utils.convertToRGB(self.opts.pppara.pickcolors[3]), 'width' : 2})
 		else:
 			plot.addLine(x = xVal, pen = {'color' : (255, 255, 255), width : 2})
+
+	def redrawTimePicks(self, plot):
+		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
+		wpick = self.opts.mcpara.wpick
+
+		if self.opts.reltime >= 0:
+			self.addTimePick(plot, plot.sacdh.gethdr(hdrini), hdrini)
+		if self.opts.reltime >= 1:
+			self.addTimePick(plot, plot.sacdh.gethdr(hdrmed), hdrmed)
+		if self.opts.reltime >= 2:
+			self.addTimePick(plot, plot.sacdh.gethdr(hdrfin), hdrfin)
+		if self.opts.reltime >= 3:
+			self.addTimePick(plot, plot.sacdh.gethdr(wpick), wpick)
 
 	def getWindow(self, hdr):
 		twh0, twh1 = self.opts.pppara.twhdrs
