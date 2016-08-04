@@ -6,6 +6,16 @@
 #
 # Copyright (c) 2016 Arnav Sankaran
 #------------------------------------------------
+"""
+Python module for mapping station with the help of GMT scripts.
+
+:copyright:
+	Arnav Sankaran
+
+:license:
+	GNU General Public License, Version 3 (GPLv3) 
+	http://www.gnu.org/licenses/gpl.html
+"""
 
 import subprocess
 import os

@@ -1,11 +1,22 @@
 #!/usr/bin/env python
 #------------------------------------------------
 # Filename: seismodata.py
-#   Author: Arnav Sankaran
+#   Author: Arnav Sankaran, Xiaoting Lou
 #    Email: arnavsankaran@gmail.com
 #
 # Copyright (c) 2016 Arnav Sankaran
 #------------------------------------------------
+"""
+Python module for extracting waveform data from sac files.
+
+:copyright:
+	Arnav Sankaran, Xiaoting Lou
+
+:license:
+	GNU General Public License, Version 3 (GPLv3) 
+	http://www.gnu.org/licenses/gpl.html
+"""
+
 from sacpickle import readPickle
 from pysmo.sac.sacio import sacfile
 from numpy import linspace, array

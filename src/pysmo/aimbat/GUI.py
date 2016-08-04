@@ -6,6 +6,17 @@
 #
 # Copyright (c) 2016 Arnav Sankaran
 #------------------------------------------------
+"""
+Python module for measuring seismic wave travel times.
+
+:copyright:
+	Arnav Sankaran
+
+:license:
+	GNU General Public License, Version 3 (GPLv3) 
+	http://www.gnu.org/licenses/gpl.html
+"""
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
