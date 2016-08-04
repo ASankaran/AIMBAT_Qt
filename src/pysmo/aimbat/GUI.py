@@ -129,13 +129,17 @@ class mainGUI(object):
 
 		self.addTimePick(plt, stkdh.gethdr(hdrini), hdrini)
 		self.addTimePick(plt, stkdh.gethdr(hdrmed), hdrmed)
+
+		plt.setXRange(stkdh.gethdr(hdrmed) + self.opts.xlimit[0], stkdh.gethdr(hdrmed) + self.opts.xlimit[1])
+
 		if stkdh.gethdr(hdrfin) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
 			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
-		if self.opts.reltime == 3:
+			plt.setXRange(stkdh.gethdr(hdrfin) + self.opts.xlimit[0], stkdh.gethdr(hdrfin) + self.opts.xlimit[1])
+		if stkdh.gethdr(self.opts.mcpara.wpick) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
+			plt.setXRange(stkdh.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[0], stkdh.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[1])
 
-		plt.setXRange(stkdh.gethdr(hdrmed) + self.opts.xlimit[0], stkdh.gethdr(hdrmed) + self.opts.xlimit[1])
 		self.scalePlotYRange(plt)
 
 		plt.setTitle(plt.titleLabel.text, color = utils.convertToRGBA(self.opts.pppara.colorwave, 75))
@@ -188,13 +192,17 @@ class mainGUI(object):
 
 			self.addTimePick(plt, sacitem.gethdr(hdrini), hdrini)
 			self.addTimePick(plt, sacitem.gethdr(hdrmed), hdrmed)
-			if sacitem.gethdr(hdrfin) != -12345.0:
-				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
-				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
-			if self.opts.reltime == 3:
-				self.addTimePick(plt, sacitem.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
 
 			plt.setXRange(sacitem.gethdr(hdrmed) + self.opts.xlimit[0], sacitem.gethdr(hdrmed) + self.opts.xlimit[1])
+
+			if sacitem.gethdr(hdrfin) != -12345.0:
+				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
+				plt.setXRange(sacitem.gethdr(hdrfin) + self.opts.xlimit[0], sacitem.gethdr(hdrfin) + self.opts.xlimit[1])
+				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
+			if sacitem.gethdr(self.opts.mcpara.wpick) != -12345.0:
+				self.addTimePick(plt, sacitem.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
+				plt.setXRange(sacitem.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[0], sacitem.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[1])
+
 			self.scalePlotYRange(plt)
 
 			self.overrideAutoScaleButton(plt)
