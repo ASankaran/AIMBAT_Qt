@@ -134,7 +134,6 @@ class mainGUI(object):
 
 		if stkdh.gethdr(hdrfin) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
-			plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 			plt.setXRange(stkdh.gethdr(hdrfin) + self.opts.xlimit[0], stkdh.gethdr(hdrfin) + self.opts.xlimit[1])
 		if stkdh.gethdr(self.opts.mcpara.wpick) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
@@ -198,7 +197,6 @@ class mainGUI(object):
 			if sacitem.gethdr(hdrfin) != -12345.0:
 				self.addTimePick(plt, sacitem.gethdr(hdrfin), hdrfin)
 				plt.setXRange(sacitem.gethdr(hdrfin) + self.opts.xlimit[0], sacitem.gethdr(hdrfin) + self.opts.xlimit[1])
-				plt.setXRange(self.opts.ccpara.twcorr[0] + plt.sacdh.gethdr(hdrfin), self.opts.ccpara.twcorr[1] + plt.sacdh.gethdr(hdrfin))
 			if sacitem.gethdr(self.opts.mcpara.wpick) != -12345.0:
 				self.addTimePick(plt, sacitem.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
 				plt.setXRange(sacitem.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[0], sacitem.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[1])
