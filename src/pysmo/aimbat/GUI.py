@@ -12,8 +12,6 @@ from PyQt4.QtCore import *
 import pyqtgraph as pg
 
 import sys
-import os
-import webbrowser
 
 from seismodata import getWaveDataSetFromSacItem
 from algiccs import ccWeightStack, checkCoverage
@@ -22,6 +20,7 @@ from sacpickle import taperWindow, saveData
 from qualsort import seleSeis, sortSeisQual, sortSeisHeader, sortSeisHeaderDiff
 import filtering
 import utils
+from stationmapping import StationMapper
 
 import numpy as np
 from numpy import nan
@@ -558,21 +557,8 @@ class mainGUI(object):
 		self.filterWindow.unapplyButton.clicked.connect(self.redrawPlots)
 
 	def mapstationsButtonClicked(self):
-		selectedLatLon = ''
-		for sacdh in self.sacgroup.selist:
-			selectedLatLon += str(sacdh.stla) + ' ' + str(sacdh.stlo) + '\n'
-		deselectedLatLon = ''
-		for sacdh in self.sacgroup.delist:
-			deselectedLatLon += str(sacdh.stla) + ' ' + str(sacdh.stlo) + '\n'
-		with open(os.path.join(os.getcwd(), 'selectedstations.gmt'), 'w+') as tmpfile:
-			tmpfile.write(selectedLatLon)
-		with open(os.path.join(os.getcwd(), 'deselectedstations.gmt'), 'w+') as tmpfile:
-			tmpfile.write(deselectedLatLon)
-
-		import subprocess
-		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-		print os.path.join(__location__, 'stationplottingtemplate.map')
-		subprocess.call(['/bin/bash', os.path.join(__location__, 'stationplottingtemplate.map')])
+		mapper = StationMapper(self.sacgroup)
+		mapper.start()
 
 	def addTimePick(self, plot, xVal, pick):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs

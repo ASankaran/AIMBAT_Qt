@@ -7,7 +7,6 @@ Uncompleted
 - Use different fill colors for when the wave is above / below the zero line
 - Incrementally load plots to decrease load time
 - Add lines between plots
-- Calculate bounding lat lon for plotting stations
 
 Completed
 ---------
@@ -28,3 +27,4 @@ Completed
 - Line up by T3 when finalize clicked
 - Override autoscale button to not zoom out to full plot
 - Use GMT for plotting stations
+- Calculate bounding lat lon for plotting stations
