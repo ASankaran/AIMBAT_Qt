@@ -78,8 +78,6 @@ class StationMapper(object):
 
 		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 		if os.name == 'nt':
-			print os.path.join(__location__, 'stationmapper.bat')
 			subprocess.call([os.path.join(__location__, 'stationmapper.bat')] + [selectedPath, deselectedPath] + [str(a) for a in args])
 		else:
-			print os.path.join(__location__, 'stationmapper.sh')
 			subprocess.call(['/bin/bash', os.path.join(__location__, 'stationmapper.sh')] + [selectedPath, deselectedPath] + [str(a) for a in args])
