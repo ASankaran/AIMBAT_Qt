@@ -31,6 +31,7 @@ Dependencies
 * [pysmo.sac](https://github.com/pysmo/sac)
 * [pyqtgraph](http://www.pyqtgraph.org/)
 * [GFortran](https://gcc.gnu.org/wiki/GFortranBinaries)
+* [GMT](http://gmt.soest.hawaii.edu/) (Optional: Only needed for plotting stations)
 
 Building
 --------
