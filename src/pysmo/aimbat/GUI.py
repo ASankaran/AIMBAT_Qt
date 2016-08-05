@@ -146,9 +146,11 @@ class mainGUI(object):
 		if stkdh.gethdr(hdrfin) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(hdrfin), hdrfin)
 			plt.setXRange(stkdh.gethdr(hdrfin) + self.opts.xlimit[0], stkdh.gethdr(hdrfin) + self.opts.xlimit[1])
+			self.opts.reltime = 2
 		if stkdh.gethdr(self.opts.mcpara.wpick) != -12345.0:
 			self.addTimePick(plt, stkdh.gethdr(self.opts.mcpara.wpick), self.opts.mcpara.wpick)
 			plt.setXRange(stkdh.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[0], stkdh.gethdr(self.opts.mcpara.wpick) + self.opts.xlimit[1])
+			self.opts.reltime = 3
 
 		self.scalePlotYRange(plt)
 
