@@ -379,6 +379,9 @@ class mainGUI(object):
 			self.redrawTimePicks(plt)
 			self.scalePlotXRange(plt)
 
+		# Move deselcted seismograms to the bottom
+		self.reorderPlots()
+
 	def syncButtonClicked(self):
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
 		wh0, wh1 = self.opts.qcpara.twhdrs
@@ -418,6 +421,9 @@ class mainGUI(object):
 		for plt in self.plotList:
 			self.redrawTimePicks(plt)
 			self.scalePlotXRange(plt)
+
+		# Move deselcted seismograms to the bottom
+		self.reorderPlots()
 
 	def finalizeButtonClicked(self):
 		self.getWindow(self.opts.mcpara.ipick)
