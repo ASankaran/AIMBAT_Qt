@@ -272,6 +272,9 @@ class mainGUI(object):
 		for item in clickedWidget.scene().items(event.scenePos()):
 			if isinstance(item, pg.graphicsItems.PlotItem.PlotItem):
 				plotItemClicked = item
+			elif isinstance(item, pg.graphicsItems.ButtonItem.ButtonItem):
+				# User clicked the auto range button. Don't select / deselect seismogram
+				return
 
 		# If double click add t2 time
 		hdrini, hdrmed, hdrfin = self.opts.qcpara.ichdrs
